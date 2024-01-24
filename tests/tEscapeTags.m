@@ -47,16 +47,6 @@ classdef tEscapeTags < matlab.unittest.TestCase
             testCase.verifyEqual(result, expected);
         end
 
-        function testEscapeEndFor(testCase)
-            % Test escaping of {/for}
-            input = "\{/for}";
-            expected = "{/for}";
-
-            f = forge.Forge();
-            result = f.render(input, struct);
-            testCase.verifyEqual(result, expected);
-        end
-
         function testEscapeIfThen(testCase)
             % Test escaping of {if then}
             input = "\{if then}";
@@ -69,8 +59,8 @@ classdef tEscapeTags < matlab.unittest.TestCase
 
         function testEscapeIfNotNow(testCase)
             % Test escaping of {if not now}
-            input = "\{if not now}";
-            expected = "{if not now}";
+            input = "\{if ~ now}";
+            expected = "{if ~ now}";
 
             f = forge.Forge();
             result = f.render(input, struct);
@@ -87,10 +77,10 @@ classdef tEscapeTags < matlab.unittest.TestCase
             testCase.verifyEqual(result, expected);
         end
 
-        function testEscapeEndIf(testCase)
+        function testEscapeEnd(testCase)
             % Test escaping of {/if}
-            input = "\{/if}";
-            expected = "{/if}";
+            input = "\{end}";
+            expected = "{end}";
 
             f = forge.Forge();
             result = f.render(input, struct);

@@ -28,12 +28,9 @@ classdef Forge
             template = string(template);
             template = template.replace("\r", "");
             template = replaceByFunction(template, "(\\*){![\s\S]*?!}", @replaceComments, stack);
-            template = replaceByFunction(template, "(\\*){([\w_.\-@:]+)}", @replaceTags, stack);
-            template = replaceByFunction(template, "(\\*){>([\w_.\-@:]+)}", @replacePartials, stack);
-            template = replaceByFunction(template, "(\\*){for +([\w_\-@:]+) +in +([\w_.\-@:]+)}", @replaceFor, stack);
-            template = replaceByFunction(template, "(\\*){if +(not +|)([\w_.\-@:]+)}", @replaceIf, stack);
-            template = replaceByFunction(template, "(\\*){\/(for|if)}", @replaceCloseStatement, stack);
-            eval("t={};t{end+1}=@(c)"""+template+""";");
+            template = replaceByFunction(template, "(\\*){(([\w_.\-@:]+)|>([\w_.\-@:]+)|for +([\w_\-@:]+) +in +([\w_.\-@:]+)|if +(~ +|)([\w_.\-@:]+))}", @replaceTags, stack);
+            t = {};
+            eval("t{end+1}=@(c)"""+template+""";");
             fn = @(c)"";
             for i=1:numel(t)
                 fn=@(c)fn(c)+t{i}(c);
@@ -52,6 +49,16 @@ for i=1:numel(matches)
 end
 end
 
+function out = replaceTags(varargin)
+stack = varargin{1};
+str = varargin{2};
+out = str;
+out = replaceByFunction(out, "(\\*){([\w_.\-@:]+)}", @replaceVars, stack);
+out = replaceByFunction(out, "(\\*){>([\w_.\-@:]+)}", @replacePartials, stack);
+out = replaceByFunction(out, "(\\*){for +([\w_\-@:]+) +in +([\w_.\-@:]+)}", @replaceFor, stack);
+out = replaceByFunction(out, "(\\*){if +(~ +|)([\w_.\-@:]+)}", @replaceIf, stack);
+end
+
 function out = replaceComments(~, str, escapeChar, ~, ~)
 if strlength(escapeChar) > 0
     out = regexprep(str, "\\", "", "once");
@@ -60,22 +67,34 @@ else
 end
 end
 
-function out = replaceTags(stack, str, escapeChar, tag, ~, ~)
+function out = replaceVars(stack, str, escapeChar, var, ~, ~)
 if strlength(escapeChar) > 0
     out = regexprep(str, "\\", "", "once");
-elseif strlength(tag) > 0
-    if tag == "else"
+elseif strlength(var) > 0
+    if var == "else"
         if ~isempty(stack.Data)
             if stack.Data{end}.statement == "if"
-                out = ";else t{end+1}=@(c)""";
+                out = """;else t{end+1}=@(c)""";
                 return
-            elseif stack.Data{end}.statement == "for"
+            % JS Version: if (block.statement == 'for') return '\'}if(!g(c,\''+block.forKey+'\')){b+=\'';
+            % elseif stack.Data{end}.statement == "for"
+            %     out = "";
+            %     return
+            end
+        end
+    elseif var == "end"
+        if ~isempty(stack.Data)
+            block = stack.pop();
+            if block.statement == "if"
+                out = """;end;t{end+1}=@(c)""";
+                return
+            elseif block.statement == "for"
                 out = "";
                 return
             end
         end
     end
-    out = """+c."+string(tag)+"+""";
+    out = """+c."+string(var)+"+""";
 end
 end
 
@@ -91,7 +110,6 @@ function out = replaceFor(stack, str, escapeChar, iterVar, forKey, ~, ~)
 if strlength(escapeChar) > 0
     out = regexprep(str, "\\", "", "once");
 elseif strlength(forKey) > 0
-    % stack.push({statement:'for', forKey:forKey, iterVar:iterVar, safeIterVar:safeIterVar});
     stack.push(struct("statement": "for", "forKey", forKey, "iterVar": iterVar))
     out = "";
 end
@@ -108,25 +126,5 @@ elseif strlength(ifKey) > 0
         in = "";
     end
     out = """;if "+in+"("+ifKey+");t{end+1}=@(c)""";
-end
-end
-
-function out = replaceCloseStatement(stack, str, escapeChar, closeStatement, ~, ~)
-if strlength(escapeChar) > 0
-    out = regexprep(str, "\\", "", "once");
-elseif strlength(closeStatement) > 0
-    % block = stack[stack.length-1];
-    % if (block && block.statement == closeStatement) {
-    %   stack.pop();
-    %   return '\'}'+(block.statement == 'for' ? 'c[\''+block.iterVar+'\']=__'+block.safeIterVar+';' : '')+'b+=\'';
-    % }
-    % console.warn('extra {/'+closeStatement+'} ignored');
-    % return '';
-    if ~isempty(stack.Data) && stack.Data{end}.statement == closeStatement
-        block = stack.pop();
-        out = """;end;t{end+1}=@(c)""";
-        return
-    end
-    out = "";
 end
 end
