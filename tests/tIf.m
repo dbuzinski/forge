@@ -34,7 +34,7 @@ classdef tIf < matlab.unittest.TestCase
         function testIfFalseElse(testCase)
             context = struct("foo", "bar");
             f = forge.Forge();
-            testCase.verifyEqual(f.render("{if biz}blah{else}{foo}{/if}", context), "bar");
+            testCase.verifyEqual(f.render("{if foo==""bar""}blah{else}{foo}{/if}", context), "bar");
         end
     end
 end
