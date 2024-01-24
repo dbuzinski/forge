@@ -60,10 +60,21 @@ else
 end
 end
 
-function out = replaceTags(~, str, escapeChar, tag, ~, ~)
+function out = replaceTags(stack, str, escapeChar, tag, ~, ~)
 if strlength(escapeChar) > 0
     out = regexprep(str, "\\", "", "once");
 elseif strlength(tag) > 0
+    if tag == "else"
+        if ~isempty(stack.Data)
+            if stack.Data{end}.statement == "if"
+                out = ";else t{end+1}=@(c)""";
+                return
+            elseif stack.Data{end}.statement == "for"
+                out = "";
+                return
+            end
+        end
+    end
     out = """+c."+string(tag)+"+""";
 end
 end
