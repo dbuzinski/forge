@@ -33,8 +33,12 @@ classdef Forge
             template = replaceByFunction(template, "(\\*){for +([\w_\-@:]+) +in +([\w_.\-@:]+)}", @replaceFor, stack);
             template = replaceByFunction(template, "(\\*){if +(not +|)([\w_.\-@:]+)}", @replaceIf, stack);
             template = replaceByFunction(template, "(\\*){\/(for|if)}", @replaceCloseStatement, stack);
-            eval("t="""+template+""";");
-            compiledTemplate = eval("@(c)"""+t+"""");
+            eval("t={};t{end+1}=@(c)"""+template+""";");
+            fn = @(c)"";
+            for i=1:numel(t)
+                fn=@(c)fn(c)+t{i}(c);
+            end
+            compiledTemplate = fn;
         end
     end
 end
@@ -60,7 +64,7 @@ function out = replaceTags(~, str, escapeChar, tag, ~, ~)
 if strlength(escapeChar) > 0
     out = regexprep(str, "\\", "", "once");
 elseif strlength(tag) > 0
-    out = """+""c."+string(tag)+"""+""";
+    out = """+c."+string(tag)+"+""";
 end
 end
 
@@ -68,7 +72,7 @@ function out = replacePartials(~, str, escapeChar, partial, ~, ~)
 if strlength(escapeChar) > 0
     out = regexprep(str, "\\", "", "once");
 elseif strlength(partial) > 0
-    out = """+""obj.render(c."+string(partial)+",c)""+""";
+    out = """+obj.render(c."+string(partial)+",c)+""";
 end
 end
 
@@ -92,7 +96,7 @@ elseif strlength(ifKey) > 0
     else
         in = "";
     end
-    out = """;if "+in+"("+ifKey+");t=t+""";
+    out = """;if "+in+"("+ifKey+");t{end+1}=@(c)""";
 end
 end
 
@@ -109,7 +113,7 @@ elseif strlength(closeStatement) > 0
     % return '';
     if ~isempty(stack.Data) && stack.Data{end}.statement == closeStatement
         block = stack.pop();
-        out = """;end;t=t+""";
+        out = """;end;t{end+1}=@(c)""";
         return
     end
     out = "";
