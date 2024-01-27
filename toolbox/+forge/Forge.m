@@ -29,8 +29,7 @@ classdef Forge
             template = template.replace("\r", "");
             template = replaceByFunction(template, "(\\*){![\s\S]*?!}", @replaceComments, stack);
             template = replaceByFunction(template, "(\\*){(([\w_.\-@:]+)|>([\w_.\-@:]+)|for +([\w_\-@:]+) *= *([\w_.\-@:]+)|if +(~ +|)([\w_.\-@:]+))}", @replaceTags, stack);
-            eval("t=""""+template+"""";");
-            compiledTemplate = eval("@(c)"""+t+"""");
+            compiledTemplate = eval("@(c)"""+template+"""");
         end
     end
 end
@@ -44,6 +43,13 @@ for i=1:numel(matches)
 end
 end
 
+function out = replaceComments(~, str, escapeChar, ~, ~)
+if strlength(escapeChar) > 0
+    out = regexprep(str, "\\", "", "once");
+else
+    out = "";
+end
+end
 
 function out = replaceTags(varargin)
 stack = varargin{1};
@@ -53,14 +59,6 @@ out = replaceByFunction(out, "(\\*){([\w_.\-@:]+)}", @replaceVars, stack);
 out = replaceByFunction(out, "(\\*){>([\w_.\-@:]+)}", @replacePartials, stack);
 out = replaceByFunction(out, "(\\*){for +([\w_\-@:]+) *= *([\w_.\-@:]+)}", @replaceFor, stack);
 out = replaceByFunction(out, "(\\*){if +(~ +|)([\w_.\-@:]+)}", @replaceIf, stack);
-end
-
-function out = replaceComments(~, str, escapeChar, ~, ~)
-if strlength(escapeChar) > 0
-    out = regexprep(str, "\\", "", "once");
-else
-    out = "";
-end
 end
 
 function out = replaceVars(stack, str, escapeChar, var, ~, ~)
@@ -80,7 +78,7 @@ elseif strlength(var) > 0
         end
     end
     if stack.isIterVar(var)
-        out = string(var);
+        out = "c."+string(var);
     else
         out = """+c."+string(var)+"+""";
     end
@@ -111,7 +109,7 @@ if ~isempty(fieldnames(c))
     end
 end
 fstr = "";
-eval("for "+iterVar+"="+forKey+";fstr=fstr+"+template+";end;");
+eval("for "+iterVar+"="+forKey+";c."+iterVar+"="+iterVar+";fstr=fstr+"+template+";end;");
 end
 
 function out = replaceIf(stack, str, escapeChar, ifNot, ifKey, ~, ~)
