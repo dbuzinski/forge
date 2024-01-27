@@ -28,14 +28,9 @@ classdef Forge
             template = string(template);
             template = template.replace("\r", "");
             template = replaceByFunction(template, "(\\*){![\s\S]*?!}", @replaceComments, stack);
-            template = replaceByFunction(template, "(\\*){(([\w_.\-@:]+)|>([\w_.\-@:]+)|for +([\w_\-@:]+) +in +([\w_.\-@:]+)|if +(~ +|)([\w_.\-@:]+))}", @replaceTags, stack);
-            t = {};
-            eval("t{end+1}=@(c)"""+template+""";");
-            fn = @(c)"";
-            for i=1:numel(t)
-                fn=@(c)fn(c)+t{i}(c);
-            end
-            compiledTemplate = fn;
+            template = replaceByFunction(template, "(\\*){(([\w_.\-@:]+)|>([\w_.\-@:]+)|for +([\w_\-@:]+) *= *([\w_.\-@:]+)|if +(~ +|)([\w_.\-@:]+))}", @replaceTags, stack);
+            eval("t=""""+template+"""";");
+            compiledTemplate = eval("@(c)"""+t+"""");
         end
     end
 end
@@ -49,13 +44,14 @@ for i=1:numel(matches)
 end
 end
 
+
 function out = replaceTags(varargin)
 stack = varargin{1};
 str = varargin{2};
 out = str;
 out = replaceByFunction(out, "(\\*){([\w_.\-@:]+)}", @replaceVars, stack);
 out = replaceByFunction(out, "(\\*){>([\w_.\-@:]+)}", @replacePartials, stack);
-out = replaceByFunction(out, "(\\*){for +([\w_\-@:]+) +in +([\w_.\-@:]+)}", @replaceFor, stack);
+out = replaceByFunction(out, "(\\*){for +([\w_\-@:]+) *= *([\w_.\-@:]+)}", @replaceFor, stack);
 out = replaceByFunction(out, "(\\*){if +(~ +|)([\w_.\-@:]+)}", @replaceIf, stack);
 end
 
@@ -71,30 +67,23 @@ function out = replaceVars(stack, str, escapeChar, var, ~, ~)
 if strlength(escapeChar) > 0
     out = regexprep(str, "\\", "", "once");
 elseif strlength(var) > 0
-    if var == "else"
-        if ~isempty(stack.Data)
-            if stack.Data{end}.statement == "if"
-                out = """;else t{end+1}=@(c)""";
-                return
-            % JS Version: if (block.statement == 'for') return '\'}if(!g(c,\''+block.forKey+'\')){b+=\'';
-            % elseif stack.Data{end}.statement == "for"
-            %     out = "";
-            %     return
-            end
-        end
-    elseif var == "end"
+    if var == "end"
         if ~isempty(stack.Data)
             block = stack.pop();
             if block.statement == "if"
-                out = """;end;t{end+1}=@(c)""";
+                out = """)+""";
                 return
             elseif block.statement == "for"
-                out = "";
+                out = """)+""";
                 return
             end
         end
     end
-    out = """+c."+string(var)+"+""";
+    if stack.isIterVar(var)
+        out = string(var);
+    else
+        out = """+c."+string(var)+"+""";
+    end
 end
 end
 
@@ -110,9 +99,19 @@ function out = replaceFor(stack, str, escapeChar, iterVar, forKey, ~, ~)
 if strlength(escapeChar) > 0
     out = regexprep(str, "\\", "", "once");
 elseif strlength(forKey) > 0
-    stack.push(struct("statement": "for", "forKey", forKey, "iterVar": iterVar))
-    out = "";
+    stack.push(struct("statement", "for", "forKey", forKey, "iterVar", iterVar))
+    out = """+forReplacement(c,"""+iterVar+""","""+forKey+""",""";
 end
+end
+
+function fstr = forReplacement(c,iterVar, forKey, template)
+if ~isempty(fieldnames(c))
+    for f = string(fieldnames(c))
+        eval(f+"=c.(f);");
+    end
+end
+fstr = "";
+eval("for "+iterVar+"="+forKey+";fstr=fstr+"+template+";end;");
 end
 
 function out = replaceIf(stack, str, escapeChar, ifNot, ifKey, ~, ~)
@@ -121,10 +120,26 @@ if strlength(escapeChar) > 0
 elseif strlength(ifKey) > 0
     stack.push(struct("statement", "if"));
     if strlength(ifNot) > 0
-        in = "~";
+        neg = "true";
     else
-        in = "";
+        neg = "false";
     end
-    out = """;if "+in+"("+ifKey+");t{end+1}=@(c)""";
+    out = """+ifReplacement(c,"+ifKey+","+neg+",""";
+end
+end
+
+function fstr = ifReplacement(c, ifKey, neg, template)
+if ~isempty(fieldnames(c))
+    for f = string(fieldnames(c))
+        eval(f+"=c.(f);");
+    end
+end
+fstr = "";
+ifStatement = eval(string(ifKey));
+if neg
+    ifStatement = ~ifStatement;
+end
+if (ifStatement)
+    fstr = fstr + template;
 end
 end

@@ -16,5 +16,20 @@ classdef Stack < handle
             d = stack.Data{end};
             stack.Data = stack.Data(1:end-1);
         end
+
+        function tf = isIterVar(stack, varName)
+            tf = false;
+            groups = varName.split(".");
+            firstGroup = groups(1);
+            for i=1:numel(stack.Data)
+                s = stack.Data{i};
+                if isfield(s, "iterVar")
+                    if s.iterVar == firstGroup
+                        tf = true;
+                        return;
+                    end
+                end
+            end
+        end
     end
 end

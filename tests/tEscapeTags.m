@@ -39,8 +39,8 @@ classdef tEscapeTags < matlab.unittest.TestCase
 
         function testEscapeForAngerInMgmt(testCase)
             % Test escaping of {for anger in mgmt}
-            input = "\{for anger in mgmt}";
-            expected = "{for anger in mgmt}";
+            input = "\{for anger=mgmt}";
+            expected = "{for anger=mgmt}";
 
             f = forge.Forge();
             result = f.render(input, struct);
