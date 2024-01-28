@@ -7,7 +7,8 @@
       "title": "A happy time",
       "content": "<p>In my childhood I would laugh and play.</p>",
       "author": "Hornsby Sumpin",
-      "tags": ["happy", "fun", "joy"]
+      "tags": ["happy", "fun", "joy"],
+      "comments": []
     },
     {
       "title": "Better days",
@@ -28,6 +29,7 @@
     {
       "title": "True madness",
       "content": "<p>Let us begin again, as we were when we were babies.</p><p>Further and further from the truth we could never travel.</p>",
+      "author": "",
       "tags": ["malaise"],
       "comments": [
         {

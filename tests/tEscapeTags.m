@@ -8,8 +8,8 @@ classdef tEscapeTags < matlab.unittest.TestCase
 
     methods (Test)
         function testEscapeBob(testCase)
-            input = "\{bob}";
-            expected = "{bob}";
+            input = "\[bob]";
+            expected = "[bob]";
 
             f = forge.Forge();
             result = f.render(input, struct);
@@ -17,8 +17,8 @@ classdef tEscapeTags < matlab.unittest.TestCase
         end
 
         function testEscapeBobBloss(testCase)
-            input = "\{bob.bloss}";
-            expected = "{bob.bloss}";
+            input = "\[bob.bloss]";
+            expected = "[bob.bloss]";
 
             f = forge.Forge();
             result = f.render(input, struct);
@@ -26,8 +26,8 @@ classdef tEscapeTags < matlab.unittest.TestCase
         end
 
         function testEscapeReindeer(testCase)
-            input = "\{>reindeer}";
-            expected = "{>reindeer}";
+            input = "\[>reindeer]";
+            expected = "[>reindeer]";
 
             f = forge.Forge();
             result = f.render(input, struct);
@@ -35,8 +35,8 @@ classdef tEscapeTags < matlab.unittest.TestCase
         end
 
         function testEscapeForAngerInMgmt(testCase)
-            input = "\{for anger=mgmt}";
-            expected = "{for anger=mgmt}";
+            input = "\[for anger=mgmt]";
+            expected = "[for anger=mgmt]";
 
             f = forge.Forge();
             result = f.render(input, struct);
@@ -44,8 +44,8 @@ classdef tEscapeTags < matlab.unittest.TestCase
         end
 
         function testEscapeIfThen(testCase)
-            input = "\{if then}";
-            expected = "{if then}";
+            input = "\[if then]";
+            expected = "[if then]";
 
             f = forge.Forge();
             result = f.render(input, struct);
@@ -53,8 +53,8 @@ classdef tEscapeTags < matlab.unittest.TestCase
         end
 
         function testEscapeIfNotNow(testCase)
-            input = "\{if ~ now}";
-            expected = "{if ~ now}";
+            input = "\[if ~ now]";
+            expected = "[if ~ now]";
 
             f = forge.Forge();
             result = f.render(input, struct);
@@ -62,8 +62,8 @@ classdef tEscapeTags < matlab.unittest.TestCase
         end
 
         function testEscapeElse(testCase)
-            input = "\{else}";
-            expected = "{else}";
+            input = "\[else]";
+            expected = "[else]";
 
             f = forge.Forge();
             result = f.render(input, struct);
@@ -71,8 +71,8 @@ classdef tEscapeTags < matlab.unittest.TestCase
         end
 
         function testEscapeEnd(testCase)
-            input = "\{end}";
-            expected = "{end}";
+            input = "\[end]";
+            expected = "[end]";
 
             f = forge.Forge();
             result = f.render(input, struct);

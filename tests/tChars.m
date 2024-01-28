@@ -44,7 +44,7 @@ classdef tChars < matlab.unittest.TestCase
         end
 
         function testEscapeVariable(testCase)
-            input = "\\""{vehicle}";
+            input = "\\""[vehicle]";
             expected = "\\""truck";
 
             f = forge.Forge();
@@ -71,7 +71,7 @@ classdef tChars < matlab.unittest.TestCase
         end
 
         function testVariableUnderscore(testCase)
-            input = "{under_score}";
+            input = "[under_score]";
             expected = "truck";
 
             f = forge.Forge();

@@ -14,7 +14,7 @@ classdef Forge
                 obj.Cache(template) = obj.compile(template);
             end
             tmplFn = obj.Cache(template);
-            result = string(tmplFn(context)).replace("\n", newline).replace("""""", """");
+            result = string(tmplFn(context)).replace("\n", newline).replace("\quote", """");
         end
     end
 
@@ -35,20 +35,20 @@ classdef Forge
                 stack (1,1) double = 0
             end
             % Remove \r and escape quotes
-            pt = template.replace(newline, "\n").replace("\r", "").replace("""", """""");
+            pt = template.replace(newline, "\n").replace("\r", "").replace("""", "\quote");
             % Replace all comments
-            [captureGroups, matches] = regexp(pt, "(\\*){![\s\S]*?!}", "tokens", "emptymatch", "match");
+            [captureGroups, matches] = regexp(pt, "(\\*)\[%[\s\S]*?%\]", "tokens", "emptymatch", "match");
             for i=1:numel(matches)
                 args = [{matches(i)} num2cell(captureGroups{i}) {pt}];
                 pt = pt.replace(matches(i), replaceComments(obj, stack, args{:}));
             end
             % Replace all tags
-            [captureGroups, matches, ~, ind] = regexp(pt, "(\\*){(([\w_.\-@:]+)|>([\w_.\-@:]+)|for +([^ }]+) *= *([^}]+)|if +(~ *|)([^}]+))}", "tokens", "match", "emptymatch");
+            [captureGroups, matches, ~, ind] = regexp(pt, "(\\*)\[(([\w_.\-@:]+)|>([\w_.\-@:]+)|for +([^ \]]+) *= *([^\]]+)|if +(~ *|)([^\]]+))\]", "tokens", "match", "emptymatch");
             if numel(matches) > 0
                 args = [{matches(1)} num2cell(captureGroups{1}) {pt}];
-                if matches(1).startsWith("{for ") || matches(1).startsWith("{if ")
+                if matches(1).startsWith("[for ") || matches(1).startsWith("[if ")
                     stack = stack + 1;
-                elseif matches(1) == "{end}"
+                elseif matches(1) == "[end]"
                     stack = stack - 1;
                 end
                 left = extractBefore(pt, ind(1)+1).replace(matches(1), replaceTags(obj, stack, args{:}));
@@ -79,10 +79,10 @@ classdef Forge
             stack = varargin{2};
             str = varargin{3};
             out = str;
-            out = replaceByFunction(obj, out, "(\\*){([\w_.\-@:]+)}", @replaceVars, stack);
-            out = replaceByFunction(obj, out, "(\\*){>([\w_.\-@:]+)}", @replacePartials, stack);
-            out = replaceByFunction(obj, out, "(\\*){for +([\w_\-@:]+) *= *([^}]+)}", @replaceFor, stack);
-            out = replaceByFunction(obj, out, "(\\*){if +(~ *|)([^}]+)}", @replaceIf, stack);
+            out = replaceByFunction(obj, out, "(\\*)\[([\w_.\-@:]+)\]", @replaceVars, stack);
+            out = replaceByFunction(obj, out, "(\\*)\[>([\w_.\-@:]+)\]", @replacePartials, stack);
+            out = replaceByFunction(obj, out, "(\\*)\[for +([\w_\-@:]+) *= *([^\]]+)\]", @replaceFor, stack);
+            out = replaceByFunction(obj, out, "(\\*)\[if +(~ *|)([^\]]+)\]", @replaceIf, stack);
         end
         
         function out = replaceVars(~, stack, str, escapeChar, var, ~, ~)
@@ -96,7 +96,7 @@ classdef Forge
                 if var == "end"
                     out = """)+""";
                 else
-                    out = """+c."+string(var)+"+""";
+                    out = """+c."+var+"+""";
                 end
             end
         end
@@ -109,7 +109,7 @@ classdef Forge
             if strlength(escapeChar) > 0
                 out = regexprep(str, "\\", "", "once");
             elseif strlength(partial) > 0
-                out = """+obj.render(c."+string(partial)+",c)+""";
+                out = """+obj.render(c."+partial+",c)+""";
             end
         end
         

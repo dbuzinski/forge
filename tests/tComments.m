@@ -8,7 +8,7 @@ classdef tComments < matlab.unittest.TestCase
 
     methods(Test)
         function testComment(testCase)
-            input = "{!this won\'t show up!}";
+            input = "[%this won\'t show up%]";
             expected = "";
 
             f = forge.Forge();
@@ -17,7 +17,7 @@ classdef tComments < matlab.unittest.TestCase
         end
 
         function testEmptyComment(testCase)
-            input = "{!!}";
+            input = "[%%]";
             expected = "";
 
             f = forge.Forge();
@@ -26,7 +26,7 @@ classdef tComments < matlab.unittest.TestCase
         end
 
         function testCommentContainingEscapeChars(testCase)
-            input = "{!this won't show up\neither!}";
+            input = "[%this won't show up\neither%]";
             expected = "";
 
             f = forge.Forge();
@@ -35,7 +35,7 @@ classdef tComments < matlab.unittest.TestCase
         end
 
         function testCommentContainingDelimiters(testCase)
-            input = "{!this won't {show} up!}";
+            input = "[%this won't [show] up%]";
             expected = "";
 
             f = forge.Forge();
@@ -44,8 +44,8 @@ classdef tComments < matlab.unittest.TestCase
         end
 
         function testEscapedComment(testCase)
-            input = "\{!this will show up!}";
-            expected = "{!this will show up!}";
+            input = "\[%this will show up%]";
+            expected = "[%this will show up%]";
 
             f = forge.Forge();
             result = f.render(input, struct);
@@ -53,8 +53,8 @@ classdef tComments < matlab.unittest.TestCase
         end
 
         function testEscapedCommentWithBackslash(testCase)
-            input = "\{!this will"+newline+" show up!}";
-            expected = "{!this will"+newline+" show up!}";
+            input = "\[%this will"+newline+" show up%]";
+            expected = "[%this will"+newline+" show up%]";
 
             f = forge.Forge();
             result = f.render(input, struct);
@@ -62,8 +62,8 @@ classdef tComments < matlab.unittest.TestCase
         end
 
         function testUnclosedComment(testCase)
-            input = "{!this will also show up}";
-            expected = "{!this will also show up}";
+            input = "[%this will also show up]";
+            expected = "[%this will also show up]";
 
             f = forge.Forge();
             result = f.render(input, struct);
@@ -71,8 +71,8 @@ classdef tComments < matlab.unittest.TestCase
         end
 
         function testCommentWithTwoCloses(testCase)
-            input = "{!this won\'t, but!}this part will show up!}";
-            expected = "this part will show up!}";
+            input = "[%this won\'t, but%]this part will show up%]";
+            expected = "this part will show up%]";
 
             f = forge.Forge();
             result = f.render(input, struct);
@@ -80,8 +80,8 @@ classdef tComments < matlab.unittest.TestCase
         end
 
         function testCommentWithDelimiterOverlaps(testCase)
-            input = "{also, {!this} part won\'t show up!}";
-            expected = "{also, ";
+            input = "[also, [%this] part won\'t show up%]";
+            expected = "[also, ";
 
             f = forge.Forge();
             result = f.render(input, struct);
@@ -89,7 +89,7 @@ classdef tComments < matlab.unittest.TestCase
         end
 
         function testMultipleComments(testCase)
-            input = "{!more than !}just one{!silly!} comment";
+            input = "[%more than %]just one[%silly%] comment";
             expected = "just one comment";
 
             f = forge.Forge();
