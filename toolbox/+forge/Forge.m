@@ -14,7 +14,7 @@ classdef Forge
                 obj.Cache(template) = obj.compile(template);
             end
             tmplFn = obj.Cache(template);
-            result = tmplFn(context);
+            result = tmplFn(context).replace("""""", """");
         end
     end
 
@@ -26,9 +26,9 @@ classdef Forge
             end
             stack = forge.internal.Stack();
             template = string(template);
-            template = template.replace("\r", "");
+            template = template.replace("\r", "").replace("""", """""");
             template = replaceByFunction(template, "(\\*){![\s\S]*?!}", @replaceComments, stack);
-            template = replaceByFunction(template, "(\\*){(([\w_.\-@:]+)|>([\w_.\-@:]+)|for +([\w_\-@:]+) *= *([\w_.\-@:]+)|if +(~ +|)([\w_.\-@:]+))}", @replaceTags, stack);
+            template = replaceByFunction(template, "(\\*){(([\w_.\-@:]+)|>([\w_.\-@:]+)|for +([\w_\-@:]+) *= *([\w_.\-@:]+)|if +(~ +|)([\w_.\-@:=""]+))}", @replaceTags, stack);
             compiledTemplate = eval("@(c)"""+template+"""");
         end
     end
@@ -58,7 +58,7 @@ out = str;
 out = replaceByFunction(out, "(\\*){([\w_.\-@:]+)}", @replaceVars, stack);
 out = replaceByFunction(out, "(\\*){>([\w_.\-@:]+)}", @replacePartials, stack);
 out = replaceByFunction(out, "(\\*){for +([\w_\-@:]+) *= *([\w_.\-@:]+)}", @replaceFor, stack);
-out = replaceByFunction(out, "(\\*){if +(~ +|)([\w_.\-@:]+)}", @replaceIf, stack);
+out = replaceByFunction(out, "(\\*){if +(~ +|)([\w_.\-@:=""]+)}", @replaceIf, stack);
 end
 
 function out = replaceVars(stack, str, escapeChar, var, ~, ~)
@@ -78,7 +78,7 @@ elseif strlength(var) > 0
         end
     end
     if stack.isIterVar(var)
-        out = "c."+string(var);
+        out = string(var);
     else
         out = """+c."+string(var)+"+""";
     end
@@ -118,11 +118,11 @@ if strlength(escapeChar) > 0
 elseif strlength(ifKey) > 0
     stack.push(struct("statement", "if"));
     if strlength(ifNot) > 0
-        neg = "true";
+        neg = "~";
     else
-        neg = "false";
+        neg = "";
     end
-    out = """+ifReplacement(c,"+ifKey+","+neg+",""";
+    out = """+ifReplacement(c,"""+ifKey+""","""+neg+""",""";
 end
 end
 
@@ -133,11 +133,5 @@ if ~isempty(fieldnames(c))
     end
 end
 fstr = "";
-ifStatement = eval(string(ifKey));
-if neg
-    ifStatement = ~ifStatement;
-end
-if (ifStatement)
-    fstr = fstr + template;
-end
+eval("if "+neg+"("+ifKey+");fstr=fstr+template;end;");
 end

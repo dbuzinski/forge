@@ -25,9 +25,18 @@ classdef tChars < matlab.unittest.TestCase
             testCase.verifyEqual(result, expected);
         end
 
+        function testEscapeDoubleQuote(testCase)
+            input = """";
+            expected = """";
+
+            f = forge.Forge();
+            result = f.render(input, struct);
+            testCase.verifyEqual(result, expected);
+        end
+
         function testEscapeCombination(testCase)
-            input = "\\''";
-            expected = "\\''";
+            input = "\\''""";
+            expected = "\\''""";
 
             f = forge.Forge();
             result = f.render(input, struct);
@@ -35,8 +44,8 @@ classdef tChars < matlab.unittest.TestCase
         end
 
         function testEscapeVariable(testCase)
-            input = "\\''{vehicle}";
-            expected = "\\''truck";
+            input = "\\""{vehicle}";
+            expected = "\\""truck";
 
             f = forge.Forge();
             result = f.render(input, struct("vehicle", "truck"));
@@ -69,41 +78,5 @@ classdef tChars < matlab.unittest.TestCase
             result = f.render(input, struct("under_score", "truck"));
             testCase.verifyEqual(result, expected);
         end
-
-        % function testVariableHyphenatedKey(testCase)
-        %     input = "{hyphenated-key}";
-        %     expected = "truck";
-        % 
-        %     f = forge.Forge();
-        %     result = f.render(input, struct("hyphenated-key", "truck"));
-        %     testCase.verifyEqual(result, expected);
-        % end
-        % 
-        % function testVariableSpecialContext(testCase)
-        %     input = "{@context}";
-        %     expected = "special tags in json-ld use at signs";
-        % 
-        %     f = forge.Forge();
-        %     result = f.render(input, struct("@context", expected));
-        %     testCase.verifyEqual(result, expected);
-        % end
-        % 
-        % function testVariableSpecialTitle(testCase)
-        %     input = "{dc:title}";
-        %     expected = "special key in json-ld use compact IRI";
-        % 
-        %     f = forge.Forge();
-        %     result = f.render(input, struct("dc:title", expected));
-        %     testCase.verifyEqual(result, expected);
-        % end
-        % 
-        % function testNestedVariables(testCase)
-        %     input = "{dc:title.dc:topic}";
-        %     expected = "special key in json-ld use compact IRI";
-        % 
-        %     f = forge.Forge();
-        %     result = f.render(input, struct);
-        %     testCase.verifyEqual(result, expected);
-        % end
     end
 end

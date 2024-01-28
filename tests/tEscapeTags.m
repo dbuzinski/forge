@@ -8,7 +8,6 @@ classdef tEscapeTags < matlab.unittest.TestCase
 
     methods (Test)
         function testEscapeBob(testCase)
-            % Test escaping of {bob}
             input = "\{bob}";
             expected = "{bob}";
 
@@ -18,7 +17,6 @@ classdef tEscapeTags < matlab.unittest.TestCase
         end
 
         function testEscapeBobBloss(testCase)
-            % Test escaping of {bob.bloss}
             input = "\{bob.bloss}";
             expected = "{bob.bloss}";
 
@@ -28,7 +26,6 @@ classdef tEscapeTags < matlab.unittest.TestCase
         end
 
         function testEscapeReindeer(testCase)
-            % Test escaping of {>reindeer}
             input = "\{>reindeer}";
             expected = "{>reindeer}";
 
@@ -38,7 +35,6 @@ classdef tEscapeTags < matlab.unittest.TestCase
         end
 
         function testEscapeForAngerInMgmt(testCase)
-            % Test escaping of {for anger in mgmt}
             input = "\{for anger=mgmt}";
             expected = "{for anger=mgmt}";
 
@@ -48,7 +44,6 @@ classdef tEscapeTags < matlab.unittest.TestCase
         end
 
         function testEscapeIfThen(testCase)
-            % Test escaping of {if then}
             input = "\{if then}";
             expected = "{if then}";
 
@@ -58,7 +53,6 @@ classdef tEscapeTags < matlab.unittest.TestCase
         end
 
         function testEscapeIfNotNow(testCase)
-            % Test escaping of {if not now}
             input = "\{if ~ now}";
             expected = "{if ~ now}";
 
@@ -68,7 +62,6 @@ classdef tEscapeTags < matlab.unittest.TestCase
         end
 
         function testEscapeElse(testCase)
-            % Test escaping of {else}
             input = "\{else}";
             expected = "{else}";
 
@@ -78,7 +71,6 @@ classdef tEscapeTags < matlab.unittest.TestCase
         end
 
         function testEscapeEnd(testCase)
-            % Test escaping of {/if}
             input = "\{end}";
             expected = "{end}";
 

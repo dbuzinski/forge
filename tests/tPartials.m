@@ -38,7 +38,6 @@ classdef tPartials < matlab.unittest.TestCase
         % end
 
         function testPartialWithContextValue(testCase)
-            % Test partial with context value
             template = "{>p}";
             expected = "3";
 
