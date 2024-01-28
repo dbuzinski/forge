@@ -7,14 +7,14 @@ classdef Forge
         function result = render(obj, template, context)
             arguments
                 obj
-                template
+                template (1,1) string
                 context = struct()
             end
             if ~isKey(obj.Cache, template)
                 obj.Cache(template) = obj.compile(template);
             end
             tmplFn = obj.Cache(template);
-            result = string(tmplFn(context)).replace("""""", """");
+            result = string(tmplFn(context)).replace("\n", newline).replace("""""", """");
         end
     end
 
@@ -35,7 +35,7 @@ classdef Forge
                 stack (1,1) double = 0
             end
             % Remove \r and escape quotes
-            pt = template.replace("\r", "").replace("""", """""");
+            pt = template.replace(newline, "\n").replace("\r", "").replace("""", """""");
             % Replace all comments
             [captureGroups, matches] = regexp(pt, "(\\*){![\s\S]*?!}", "tokens", "emptymatch", "match");
             for i=1:numel(matches)
@@ -43,7 +43,7 @@ classdef Forge
                 pt = pt.replace(matches(i), replaceComments(obj, stack, args{:}));
             end
             % Replace all tags
-            [captureGroups, matches, ~, ind] = regexp(pt, "(\\*){(([\w_.\-@:]+)|>([\w_.\-@:]+)|for +([\w_\-@:]+) *= *([\w_.\-@:]+)|if +(~ +|)([\w_.\-@:=""]+))}", "tokens", "match", "emptymatch");
+            [captureGroups, matches, ~, ind] = regexp(pt, "(\\*){(([\w_.\-@:]+)|>([\w_.\-@:]+)|for +([^ }]+) *= *([^}]+)|if +(~ *|)([^}]+))}", "tokens", "match", "emptymatch");
             if numel(matches) > 0
                 args = [{matches(1)} num2cell(captureGroups{1}) {pt}];
                 if matches(1).startsWith("{for ") || matches(1).startsWith("{if ")
@@ -81,8 +81,8 @@ classdef Forge
             out = str;
             out = replaceByFunction(obj, out, "(\\*){([\w_.\-@:]+)}", @replaceVars, stack);
             out = replaceByFunction(obj, out, "(\\*){>([\w_.\-@:]+)}", @replacePartials, stack);
-            out = replaceByFunction(obj, out, "(\\*){for +([\w_\-@:]+) *= *([\w_.\-@:]+)}", @replaceFor, stack);
-            out = replaceByFunction(obj, out, "(\\*){if +(~ +|)([\w_.\-@:=""]+)}", @replaceIf, stack);
+            out = replaceByFunction(obj, out, "(\\*){for +([\w_\-@:]+) *= *([^}]+)}", @replaceFor, stack);
+            out = replaceByFunction(obj, out, "(\\*){if +(~ *|)([^}]+)}", @replaceIf, stack);
         end
         
         function out = replaceVars(~, stack, str, escapeChar, var, ~, ~)

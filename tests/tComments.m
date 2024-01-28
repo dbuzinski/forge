@@ -53,8 +53,8 @@ classdef tComments < matlab.unittest.TestCase
         end
 
         function testEscapedCommentWithBackslash(testCase)
-            input = "\{!this will\n show up!}";
-            expected = "{!this will\n show up!}";
+            input = "\{!this will"+newline+" show up!}";
+            expected = "{!this will"+newline+" show up!}";
 
             f = forge.Forge();
             result = f.render(input, struct);

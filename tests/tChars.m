@@ -53,8 +53,8 @@ classdef tChars < matlab.unittest.TestCase
         end
 
         function testNewlineCharacter(testCase)
-            input = "bob\nsue";
-            expected = "bob\nsue";
+            input = "bob"+newline+"sue";
+            expected = "bob"+newline+"sue";
 
             f = forge.Forge();
             result = f.render(input);
@@ -62,8 +62,8 @@ classdef tChars < matlab.unittest.TestCase
         end
 
         function testCarriageReturnNewline(testCase)
-            input = "bob\r\nsue";
-            expected = "bob\nsue";
+            input = "bob\r"+newline+"sue";
+            expected = "bob"+newline+"sue";
 
             f = forge.Forge();
             result = f.render(input);
