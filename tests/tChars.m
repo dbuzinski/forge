@@ -12,7 +12,7 @@ classdef tChars < matlab.unittest.TestCase
             expected = "\";
 
             f = forge.Forge();
-            result = f.render(input, struct);
+            result = f.render(input);
             testCase.verifyEqual(result, expected);
         end
 
@@ -21,7 +21,7 @@ classdef tChars < matlab.unittest.TestCase
             expected = "''";
 
             f = forge.Forge();
-            result = f.render(input, struct);
+            result = f.render(input);
             testCase.verifyEqual(result, expected);
         end
 
@@ -30,7 +30,7 @@ classdef tChars < matlab.unittest.TestCase
             expected = """";
 
             f = forge.Forge();
-            result = f.render(input, struct);
+            result = f.render(input);
             testCase.verifyEqual(result, expected);
         end
 
@@ -39,7 +39,7 @@ classdef tChars < matlab.unittest.TestCase
             expected = "\\''""";
 
             f = forge.Forge();
-            result = f.render(input, struct);
+            result = f.render(input);
             testCase.verifyEqual(result, expected);
         end
 
@@ -57,7 +57,7 @@ classdef tChars < matlab.unittest.TestCase
             expected = "bob\nsue";
 
             f = forge.Forge();
-            result = f.render(input, struct);
+            result = f.render(input);
             testCase.verifyEqual(result, expected);
         end
 
@@ -66,7 +66,7 @@ classdef tChars < matlab.unittest.TestCase
             expected = "bob\nsue";
 
             f = forge.Forge();
-            result = f.render(input, struct);
+            result = f.render(input);
             testCase.verifyEqual(result, expected);
         end
 

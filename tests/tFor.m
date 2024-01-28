@@ -68,12 +68,33 @@ classdef tFor < matlab.unittest.TestCase
             f = forge.Forge();
             testCase.verifyEqual(f.render(template, context), "orange");
         end
-        
+
+        function testVerticalArray(testCase)
+            template = "{for x=arr}{x}{end}";
+            context = struct("arr", [1; 2; 3]);
+            f = forge.Forge();
+            testCase.verifyEqual(f.render(template, context), "123");
+        end
+
         function testNestedForTag(testCase)
             template = "{for x=arr}{for y=x}{y}{end}{end}";
             context = struct("arr",[["a"; "b"; "c"], ["d"; "e"; "f"], ["g"; "h";"i"];]);
             f = forge.Forge();
             testCase.verifyEqual(f.render(template, context), "abcdefghi");
+        end
+
+        function testNestedIfTag(testCase)
+            template = "{for x=arr}{if x==2}{x}{end}{end}";
+            context = struct("arr", [1; 2; 3]);
+            f = forge.Forge();
+            testCase.verifyEqual(f.render(template, context), "2");
+        end
+
+        function testNestedPartialTag(testCase)
+            template = "{for x=arr}{>x}{end}";
+            context = struct("arr", "ayo");
+            f = forge.Forge();
+            testCase.verifyEqual(f.render(template, context), "ayo");
         end
     end
 end
