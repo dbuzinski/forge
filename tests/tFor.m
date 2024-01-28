@@ -71,7 +71,7 @@ classdef tFor < matlab.unittest.TestCase
         
         function testNestedForTag(testCase)
             template = "{for x=arr}{for y=x}{y}{end}{end}";
-            context = struct("arr",[["a", "b", "c"]; ["d", "e", "f"]; ["g", "h", "i"];]);
+            context = struct("arr",[["a"; "b"; "c"], ["d"; "e"; "f"], ["g"; "h";"i"];]);
             f = forge.Forge();
             testCase.verifyEqual(f.render(template, context), "abcdefghi");
         end

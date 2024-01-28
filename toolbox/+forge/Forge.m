@@ -19,31 +19,41 @@ classdef Forge
     end
 
     methods (Access=private)
-        function compiledTemplate = compile(obj, template)
-            if isa(template, "function_handle")
-                compiledTemplate = template;
-                return;
+        function ct = compile(obj, template)
+            arguments
+                obj
+                template (1,1) string
             end
-            stack = forge.internal.Stack();
-            template = string(template);
+            pt = obj.parse(template);
+            ct = eval("@(c)"""+pt+"""");
+        end
+
+        function pt = parse(obj, template, stack)
+            arguments
+                obj
+                template (1,1) string
+                stack (1,1) double = 0
+            end
             % Remove \r and escape quotes
-            template = template.replace("\r", "").replace("""", """""");
+            pt = template.replace("\r", "").replace("""", """""");
             % Replace all comments
-            [captureGroups, matches, offsets] = regexp(template, "(\\*){![\s\S]*?!}", "tokens", "emptymatch", "match");
+            [captureGroups, matches] = regexp(pt, "(\\*){![\s\S]*?!}", "tokens", "emptymatch", "match");
             for i=1:numel(matches)
-                args = [{matches(i)} num2cell(captureGroups{i}) {offsets(i)} {template}];
-                template = template.replace(matches(i), replaceComments(obj, stack, args{:}));
+                args = [{matches(i)} num2cell(captureGroups{i}) {pt}];
+                pt = pt.replace(matches(i), replaceComments(obj, stack, args{:}));
             end
             % Replace all tags
-            [captureGroups, matches, ~, ind] = regexp(template, "(\\*){(([\w_.\-@:]+)|>([\w_.\-@:]+)|for +([\w_\-@:]+) *= *([\w_.\-@:]+)|if +(~ +|)([\w_.\-@:=""]+))}", "tokens", "match", "emptymatch");
+            [captureGroups, matches, ~, ind] = regexp(pt, "(\\*){(([\w_.\-@:]+)|>([\w_.\-@:]+)|for +([\w_\-@:]+) *= *([\w_.\-@:]+)|if +(~ +|)([\w_.\-@:=""]+))}", "tokens", "match", "emptymatch");
             if numel(matches) > 0
-                args = [{matches(1)} num2cell(captureGroups{1}) {template}];
-                first = extractBefore(template, ind(1)+1).replace(matches(1), replaceTags(obj, stack, args{:}));
-                second = obj.compile(extractAfter(template, ind(1)));
-                first = eval("@(c)"""+first+"""");
-                compiledTemplate = @(c)first(c)+second(c);
-            else
-                compiledTemplate = @(c)template;
+                args = [{matches(1)} num2cell(captureGroups{1}) {pt}];
+                if matches(1).startsWith("{for ") || matches(1).startsWith("{if ")
+                    stack = stack + 1;
+                elseif matches(1) == "{end}"
+                    stack = stack - 1;
+                end
+                left = extractBefore(pt, ind(1)+1).replace(matches(1), replaceTags(obj, stack, args{:}));
+                right = obj.parse(extractAfter(pt, ind(1)), stack);
+                pt = left + right;
             end
         end
 
@@ -64,48 +74,6 @@ classdef Forge
             end
         end
         
-        function out = replaceVars(~, stack, str, escapeChar, var, ~, ~)
-            if strlength(escapeChar) > 0
-                out = regexprep(str, "\\", "", "once");
-            elseif strlength(var) > 0
-                if var == "end"
-                    if ~isempty(stack.Data)
-                        block = stack.pop();
-                        if block.statement == "if"
-                            out = """)+""";
-                            return
-                        elseif block.statement == "for"
-                            out = """)+""";
-                            return
-                        end
-                    end
-                end
-                out = """+c."+string(var)+"+""";
-            end
-        end
-        
-        function out = replacePartials(~, ~, str, escapeChar, partial, ~, ~)
-            if strlength(escapeChar) > 0
-                out = regexprep(str, "\\", "", "once");
-            elseif strlength(partial) > 0
-                out = """+obj.render(c."+string(partial)+",c)+""";
-            end
-        end
-        
-        function out = replaceIf(~, stack, str, escapeChar, ifNot, ifKey, ~, ~)
-            if strlength(escapeChar) > 0
-                out = regexprep(str, "\\", "", "once");
-            elseif strlength(ifKey) > 0
-                stack.push(struct("statement", "if"));
-                if strlength(ifNot) > 0
-                    neg = "~";
-                else
-                    neg = "";
-                end
-                out = """+ifReplacement(c,"""+ifKey+""","""+neg+""",""";
-            end
-        end
-        
         function out = replaceTags(varargin)
             obj = varargin{1};
             stack = varargin{2};
@@ -116,34 +84,90 @@ classdef Forge
             out = replaceByFunction(obj, out, "(\\*){for +([\w_\-@:]+) *= *([\w_.\-@:]+)}", @replaceFor, stack);
             out = replaceByFunction(obj, out, "(\\*){if +(~ +|)([\w_.\-@:=""]+)}", @replaceIf, stack);
         end
-
-        function out = replaceFor(obj, stack, str, escapeChar, iterVar, forKey, ~, ~)
+        
+        function out = replaceVars(~, stack, str, escapeChar, var, ~, ~)
+            out = str;
+            if stack > 0
+                return
+            end
             if strlength(escapeChar) > 0
                 out = regexprep(str, "\\", "", "once");
-            elseif strlength(forKey) > 0
-                stack.push(struct("statement", "for", "forKey", forKey, "iterVar", iterVar))
-                out = """+forReplacement(obj,c,"""+iterVar+""","""+forKey+""",""";
+            elseif strlength(var) > 0
+                if var == "end"
+                    out = """)+""";
+                else
+                    out = """+c."+string(var)+"+""";
+                end
             end
         end
         
-        function fstr = forReplacement(obj, c,iterVar, forKey, template)
+        function out = replacePartials(~, stack, str, escapeChar, partial, ~, ~)
+            out = str;
+            if stack > 0
+                return
+            end
+            if strlength(escapeChar) > 0
+                out = regexprep(str, "\\", "", "once");
+            elseif strlength(partial) > 0
+                out = """+obj.render(c."+string(partial)+",c)+""";
+            end
+        end
+        
+        function out = replaceIf(~, stack, str, escapeChar, ifNot, ifKey, ~, ~)
+            out = str;
+            if stack > 1
+                return
+            end
+            if strlength(escapeChar) > 0
+                out = regexprep(str, "\\", "", "once");
+            elseif strlength(ifKey) > 0
+                if strlength(ifNot) > 0
+                    neg = "~";
+                else
+                    neg = "";
+                end
+                out = """+ifReplacement(obj,c,"""+ifKey+""","""+neg+""",""";
+            end
+        end
+        
+        function fstr = ifReplacement(obj, c, ifKey, neg, template)
             if ~isempty(fieldnames(c))
-                for f = string(fieldnames(c))
+                for f = string(fieldnames(c))'
                     eval(f+"=c.(f);");
                 end
             end
             fstr = "";
-            eval("for "+iterVar+"="+forKey+";c."+iterVar+"="+iterVar+";fstr=fstr+obj.render(template,c);end;");
+            safeIfKey = eval(neg+"("+ifKey+")");
+            if safeIfKey
+                fstr=fstr + obj.render(template,c);
+            end
+        end
+        
+        function out = replaceFor(~, stack, str, escapeChar, iterVar, forKey, ~, ~)
+            out = str;
+            if stack > 1
+                return
+            end
+            if strlength(escapeChar) > 0
+                out = regexprep(str, "\\", "", "once");
+            elseif strlength(forKey) > 0
+                out = """+forReplacement(obj,c,"""+iterVar+""","""+forKey+""",""";
+            end
+        end
+
+        function fstr = forReplacement(obj, c,iterVar, forKey, template)
+                if ~isempty(fieldnames(c))
+                    for f = string(fieldnames(c))'
+                        eval(f+"=c.(f);");
+                    end
+                end
+                fstr = "";
+                safeForKey = eval(forKey);
+                safeForKey = safeForKey(:)';
+                for safeIterVar = safeForKey
+                    c.(iterVar)=safeIterVar;
+                    fstr = fstr + obj.render(template,c);
+                end
         end
     end
-end
-
-function fstr = ifReplacement(c, ifKey, neg, template)
-if ~isempty(fieldnames(c))
-    for f = string(fieldnames(c))
-        eval(f+"=c.(f);");
-    end
-end
-fstr = "";
-eval("if "+neg+"("+ifKey+");fstr=fstr+template;end;");
 end
