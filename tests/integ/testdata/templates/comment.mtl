@@ -1,7 +1,7 @@
 <section class="comment">
-  <header>
-    <h1>A comment on {post.title}{if strlength(post.author)>0}, written by {post.author}{end}</h1>
-    <p class="by">{comment.author}</p>
-  </header>
-  <div>{comment.content}</div>
+    <header>
+        <h1>A comment on {post.title}{if strlength(post.author) > 0}, written by {post.author}{end}</h1>
+        <p class="by">{comment.author}</p>
+    </header>
+    <div>{comment.content}</div>
 </section>

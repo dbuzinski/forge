@@ -1,9 +1,9 @@
 <!doctype html>
 <html>
-  <head>
-    <title>{title}</title>
-  </head>
-  <body>
-    {body}
-  </body>
+    <head>
+        <title>{title}</title>
+    </head>
+    <body>
+        {body}
+    </body>
 </html>
