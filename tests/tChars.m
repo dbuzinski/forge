@@ -1,17 +1,10 @@
 classdef tChars < matlab.unittest.TestCase
-    methods (TestClassSetup)
-        function instantiateForge(testCase)
-            import matlab.unittest.fixtures.PathFixture;
-            testCase.applyFixture(PathFixture("../toolbox"));
-        end
-    end
-    
     methods (Test)
         function testBackslash(testCase)
             input = "\";
             expected = "\";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input);
             testCase.verifyEqual(result, expected);
         end
@@ -20,7 +13,7 @@ classdef tChars < matlab.unittest.TestCase
             input = "''";
             expected = "''";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input);
             testCase.verifyEqual(result, expected);
         end
@@ -29,7 +22,7 @@ classdef tChars < matlab.unittest.TestCase
             input = """";
             expected = """";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input);
             testCase.verifyEqual(result, expected);
         end
@@ -38,7 +31,7 @@ classdef tChars < matlab.unittest.TestCase
             input = "\\''""";
             expected = "\\''""";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input);
             testCase.verifyEqual(result, expected);
         end
@@ -47,7 +40,7 @@ classdef tChars < matlab.unittest.TestCase
             input = "\\""{vehicle}";
             expected = "\\""truck";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct("vehicle", "truck"));
             testCase.verifyEqual(result, expected);
         end
@@ -56,7 +49,7 @@ classdef tChars < matlab.unittest.TestCase
             input = "bob"+newline+"sue";
             expected = "bob"+newline+"sue";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input);
             testCase.verifyEqual(result, expected);
         end
@@ -65,7 +58,7 @@ classdef tChars < matlab.unittest.TestCase
             input = "bob\r"+newline+"sue";
             expected = "bob"+newline+"sue";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input);
             testCase.verifyEqual(result, expected);
         end
@@ -74,7 +67,7 @@ classdef tChars < matlab.unittest.TestCase
             input = "{under_score}";
             expected = "truck";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct("under_score", "truck"));
             testCase.verifyEqual(result, expected);
         end

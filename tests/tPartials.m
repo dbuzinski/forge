@@ -1,18 +1,11 @@
 classdef tPartials < matlab.unittest.TestCase
-    methods (TestClassSetup)
-        function instantiateForge(testCase)
-            import matlab.unittest.fixtures.PathFixture;
-            testCase.applyFixture(PathFixture("../toolbox"));
-        end
-    end
-    
     methods (Test)
         % function testPartialEmptyContext(testCase)
         %     % Test partial with empty context
         %     template = "{>p}";
         %     expected = "";
         % 
-        %     f = forge.Forge();
+        %     f = Forge();
         %     result = f.render(template);
         %     testCase.verifyEqual(result, expected);
         % end
@@ -22,7 +15,7 @@ classdef tPartials < matlab.unittest.TestCase
         %     template = "{>p}";
         %     expected = "";
         % 
-        %     f = forge.Forge();
+        %     f = Forge();
         %     result = f.render(template, struct());
         %     testCase.verifyEqual(result, expected);
         % end
@@ -32,7 +25,7 @@ classdef tPartials < matlab.unittest.TestCase
         %     template = "{>p.a}";
         %     expected = "";
         % 
-        %     f = forge.Forge();
+        %     f = Forge();
         %     result = f.render(template, struct());
         %     testCase.verifyEqual(result, expected);
         % end
@@ -41,7 +34,7 @@ classdef tPartials < matlab.unittest.TestCase
             template = "{>p}";
             expected = "3";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(template, struct("p", 3));
             testCase.verifyEqual(result, expected);
         end
@@ -51,7 +44,7 @@ classdef tPartials < matlab.unittest.TestCase
         %     template = "{>p}";
         %     expected = "";
         % 
-        %     f = forge.Forge();
+        %     f = Forge();
         %     result = f.render(template, struct("p", {}));
         %     testCase.verifyEqual(result, expected);
         % end
@@ -61,7 +54,7 @@ classdef tPartials < matlab.unittest.TestCase
         %     template = "{>p}";
         %     expected = "foo";
         % 
-        %     f = forge.Forge();
+        %     f = Forge();
         %     result = f.render(template, struct("p", @(~) "foo"));
         %     testCase.verifyEqual(result, expected);
         % end
@@ -71,7 +64,7 @@ classdef tPartials < matlab.unittest.TestCase
             template = "{>p.a}";
             expected = "foo";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(template, struct("p", struct("a", "foo")));
             testCase.verifyEqual(result, expected);
         end
@@ -81,7 +74,7 @@ classdef tPartials < matlab.unittest.TestCase
             template = "{>p.a.b}";
             expected = "foo";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(template, struct("p", struct("a", struct("b", "foo"))));
             testCase.verifyEqual(result, expected);
         end
@@ -95,7 +88,7 @@ classdef tPartials < matlab.unittest.TestCase
         %     }, "partials", struct("author", "author: {author.name}{for pet in author.pets}{>partials.comma} {>partials.pet}{/for}", "pet", "pet: {pet.name}", "comma", ","));
         %     expected = "book: Bob, author: Liz, pet: Errol, author: Jan";
         % 
-        %     f = forge.Forge();
+        %     f = Forge();
         %     result = f.render(template, context);
         %     testCase.verifyEqual(result, expected);
         % end

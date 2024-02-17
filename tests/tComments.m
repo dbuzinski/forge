@@ -1,17 +1,10 @@
 classdef tComments < matlab.unittest.TestCase
-    methods (TestClassSetup)
-        function instantiateForge(testCase)
-            import matlab.unittest.fixtures.PathFixture;
-            testCase.applyFixture(PathFixture("../toolbox"));
-        end
-    end
-
     methods(Test)
         function testComment(testCase)
             input = "{%this won\'t show up%}";
             expected = "";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -20,7 +13,7 @@ classdef tComments < matlab.unittest.TestCase
             input = "{%%}";
             expected = "";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -29,7 +22,7 @@ classdef tComments < matlab.unittest.TestCase
             input = "{%this won't show up\neither%}";
             expected = "";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -38,7 +31,7 @@ classdef tComments < matlab.unittest.TestCase
             input = "{%this won't {show} up%}";
             expected = "";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -47,7 +40,7 @@ classdef tComments < matlab.unittest.TestCase
             input = "\{%this will show up%}";
             expected = "{%this will show up%}";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -56,7 +49,7 @@ classdef tComments < matlab.unittest.TestCase
             input = "\{%this will"+newline+" show up%}";
             expected = "{%this will"+newline+" show up%}";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -65,7 +58,7 @@ classdef tComments < matlab.unittest.TestCase
             input = "{%this will also show up}";
             expected = "{%this will also show up}";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -74,7 +67,7 @@ classdef tComments < matlab.unittest.TestCase
             input = "{%this won\'t, but%}this part will show up%}";
             expected = "this part will show up%}";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -83,7 +76,7 @@ classdef tComments < matlab.unittest.TestCase
             input = "{also, {%this} part won\'t show up%}";
             expected = "{also, ";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -92,7 +85,7 @@ classdef tComments < matlab.unittest.TestCase
             input = "{%more than %}just one{%silly%} comment";
             expected = "just one comment";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end

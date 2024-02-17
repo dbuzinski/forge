@@ -1,17 +1,10 @@
 classdef tEscapeTags < matlab.unittest.TestCase
-    methods (TestClassSetup)
-        function instantiateForge(testCase)
-            import matlab.unittest.fixtures.PathFixture;
-            testCase.applyFixture(PathFixture("../toolbox"));
-        end
-    end
-
     methods (Test)
         function testEscapeBob(testCase)
             input = "\{bob}";
             expected = "{bob}";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -20,7 +13,7 @@ classdef tEscapeTags < matlab.unittest.TestCase
             input = "\{bob.bloss}";
             expected = "{bob.bloss}";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -29,7 +22,7 @@ classdef tEscapeTags < matlab.unittest.TestCase
             input = "\{>reindeer}";
             expected = "{>reindeer}";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -38,7 +31,7 @@ classdef tEscapeTags < matlab.unittest.TestCase
             input = "\{for anger=mgmt}";
             expected = "{for anger=mgmt}";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -47,7 +40,7 @@ classdef tEscapeTags < matlab.unittest.TestCase
             input = "\{if then}";
             expected = "{if then}";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -56,7 +49,7 @@ classdef tEscapeTags < matlab.unittest.TestCase
             input = "\{if ~ now}";
             expected = "{if ~ now}";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -65,7 +58,7 @@ classdef tEscapeTags < matlab.unittest.TestCase
             input = "\{else}";
             expected = "{else}";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
@@ -74,7 +67,7 @@ classdef tEscapeTags < matlab.unittest.TestCase
             input = "\{end}";
             expected = "{end}";
 
-            f = forge.Forge();
+            f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
