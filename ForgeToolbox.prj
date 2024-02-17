@@ -6,7 +6,7 @@
     <param.company />
     <param.summary />
     <param.description />
-    <param.screenshot>/Users/david/Desktop/Forge.png</param.screenshot>
+    <param.screenshot>${PROJECT_ROOT}/images/Forge.png</param.screenshot>
     <param.version>1.0</param.version>
     <param.output>${PROJECT_ROOT}/Forge Template Engine.mltbx</param.output>
     <param.products.name />
