@@ -15,13 +15,5 @@ end
 
 function packageTask(ctx)
 % Package toolbox
-
-% Copy src
-copyfile("src/*", "toolbox");
-
-% Copy doc
-copyfile("doc/GettingStarted.mlx", "toolbox");
-
-% Package toolbox
 matlab.addons.toolbox.packageToolbox("ForgeToolbox.prj", ctx.Task.Outputs.Path);
 end

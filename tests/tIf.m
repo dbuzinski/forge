@@ -1,39 +1,57 @@
 classdef tIf < matlab.unittest.TestCase
     methods (Test)
         function testIfTrue(testCase)
-            context = struct("foo", "bar");
+            context = struct("a", "euclid");
             f = Forge();
-            testCase.verifyEqual(f.render("{if true}{foo}{end}", context), "bar");
+            testCase.verifyEqual(f.render("{if true}{a}{end}", context), "euclid");
         end
         
         function testIfFalse(testCase)
-            context = struct("foo", "bar");
+            context = struct("a", "euclid");
             f = Forge();
-            testCase.verifyEqual(f.render("{if false}{foo}{end}", context), "");
+            testCase.verifyEqual(f.render("{if false}{a}{end}", context), "");
         end
         
         function testIfNotTrue(testCase)
-            context = struct("foo", "bar");
+            context = struct("a", "euclid");
             f = Forge();
-            testCase.verifyEqual(f.render("{if ~ true}{foo}{end}", context), "");
+            testCase.verifyEqual(f.render("{if ~ true}{a}{end}", context), "");
         end
         
         function testIfNotFalse(testCase)
-            context = struct("foo", "bar");
+            context = struct("a", "euclid");
             f = Forge();
-            testCase.verifyEqual(f.render("{if ~ false}{foo}{end}", context), "bar");
+            testCase.verifyEqual(f.render("{if ~ false}{a}{end}", context), "euclid");
         end
 
         function testConditionDependsOnContext(testCase)
-            context = struct("foo", "bar");
+            context = struct("a", "euclid");
             f = Forge();
-            testCase.verifyEqual(f.render("{if foo==string('bar')}{foo}{end}", context), "bar");
+            testCase.verifyEqual(f.render("{if a==""euclid""}{a}{end}", context), "euclid");
+        end
+
+        function testIfElseif(testCase)
+            context = struct("a", "euclid");
+            f = Forge();
+            testCase.verifyEqual(f.render("{if false}blah{elseif true}{a}{end}", context), "euclid");
+        end
+
+        function testIfMultipleElseif(testCase)
+            context = struct("a", "euclid");
+            f = Forge();
+            testCase.verifyEqual(f.render("{if false}blah{elseif false}blah{elseif true}{a}{end}", context), "euclid");
         end
         
-        % function testIfFalseElse(testCase)
-        %     context = struct("foo", "bar");
-        %     f = Forge();
-        %     testCase.verifyEqual(f.render("{if false}blah{else}{foo}{end}", context), "bar");
-        % end
+        function testIfElse(testCase)
+            context = struct("a", "euclid");
+            f = Forge();
+            testCase.verifyEqual(f.render("{if false}blah{else}{a}{end}", context), "euclid");
+        end
+
+        function testIfElseifElse(testCase)
+            context = struct("a", "euclid");
+            f = Forge();
+            testCase.verifyEqual(f.render("{if false}blah{elseif false}blah{else}{a}{end}", context), "euclid");
+        end
     end
 end

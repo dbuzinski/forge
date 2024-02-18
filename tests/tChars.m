@@ -37,17 +37,17 @@ classdef tChars < matlab.unittest.TestCase
         end
 
         function testEscapeVariable(testCase)
-            input = "\\""{vehicle}";
-            expected = "\\""truck";
+            input = "\\""{a}";
+            expected = "\\""euclid";
 
             f = Forge();
-            result = f.render(input, struct("vehicle", "truck"));
+            result = f.render(input, struct("a", "euclid"));
             testCase.verifyEqual(result, expected);
         end
 
         function testNewlineCharacter(testCase)
-            input = "bob"+newline+"sue";
-            expected = "bob"+newline+"sue";
+            input = "euclid"+newline+"hilbert";
+            expected = "euclid"+newline+"hilbert";
 
             f = Forge();
             result = f.render(input);
@@ -55,8 +55,8 @@ classdef tChars < matlab.unittest.TestCase
         end
 
         function testCarriageReturnNewline(testCase)
-            input = "bob\r"+newline+"sue";
-            expected = "bob"+newline+"sue";
+            input = "euclid\r"+newline+"hilbert";
+            expected = "euclid"+newline+"hilbert";
 
             f = Forge();
             result = f.render(input);
@@ -65,10 +65,37 @@ classdef tChars < matlab.unittest.TestCase
 
         function testVariableUnderscore(testCase)
             input = "{under_score}";
-            expected = "truck";
+            expected = "euclid";
 
             f = Forge();
-            result = f.render(input, struct("under_score", "truck"));
+            result = f.render(input, struct("under_score", "euclid"));
+            testCase.verifyEqual(result, expected);
+        end
+        
+        function testTagWithSpacesAround(testCase)
+            input = "{ myvar }";
+            expected = "euclid";
+
+            f = Forge();
+            result = f.render(input, struct("myvar", "euclid"));
+            testCase.verifyEqual(result, expected);
+        end
+
+        function testTagWithSpacesBefore(testCase)
+            input = "{ myvar}";
+            expected = "euclid";
+
+            f = Forge();
+            result = f.render(input, struct("myvar", "euclid"));
+            testCase.verifyEqual(result, expected);
+        end
+
+        function testTagWithSpacesAfter(testCase)
+            input = "{myvar }";
+            expected = "euclid";
+
+            f = Forge();
+            result = f.render(input, struct("myvar", "euclid"));
             testCase.verifyEqual(result, expected);
         end
     end
