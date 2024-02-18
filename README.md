@@ -6,7 +6,7 @@ Forge is an intuitive yet powerful template engine for MATLAB.
 About
 -----
 
-Forge is an intuitive and surprisingly powerful template engine designed to generate dynamic content with MATLAB. It supports variables, comments, conditionals, and loops as the key concepts for template development. Forge also allows nesting templates for more modular dynamic rendering, as well as the option to cache previously rendered templates for increased rendering speed. The blend of simplicity and speed makes Forge a great choice for project of all sizes.
+Forge is an intuitive yet powerful template engine crafted for generating dynamic content with MATLAB. It supports variables, comments, conditionals, and loops as fundamental elements for template creation. Additionally, Forge enables the nesting of templates for more modular dynamic rendering, alongside the capability to cache previously rendered templates to enhance rendering speed. This combination of simplicity and efficiency makes Forge an excellent option for projects of any size.
 
 Examples
 --------
