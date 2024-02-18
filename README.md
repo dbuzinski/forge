@@ -130,7 +130,7 @@ Example: `"{>subtemplate}"`
 Build and Test
 --------------
 
-Forge uses the [MATLAB Build Tool](https://www.mathworks.com/help/matlab/matlab_prog/overview-of-matlab-build-tool.html) to lint, test, and package. To run all tests and package the toolbox, run the `buildtool` command from the repository root. Run `buildtool -tasks` to see the list of all available tasks.
+Forge uses the [MATLAB Build Tool](https://www.mathworks.com/help/matlab/matlab_prog/overview-of-matlab-build-tool.html) to lint, test, and package. To run all tests and package the toolbox, run `buildtool` from the repository root. Run `buildtool -tasks` to see the list of all available tasks.
 
 Acknowledgments
 ---------------
