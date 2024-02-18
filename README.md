@@ -84,9 +84,9 @@ ctx.author = "David";
 ctx.summary = "Forge is a simple yet powerful template engine!";
 ctx.ref = "/getting-started";
 
-% Render and display the output
+% Render and save the output to a .html file
 post = renderer.render(blogPostTmpl, ctx);
-disp(post);
+writelines(post, "post.html");
 ```
 
 Usage
