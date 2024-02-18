@@ -51,11 +51,17 @@ classdef Forge
                 pt = pt.replace(match(i), replaceComments(obj, stack, args{:}));
             end
             % Replace all tags
-            [captureGroups, match, ~, ind] = regexp(pt, "(\\*){ *(([\w_.\-@:]+)|>([\w_.\-@:]+)|for +([^ }]+) *= *([^}]+)|if +(~ *|)([^}]+)) *}", "tokens", "match", "emptymatch");
+            [captureGroups, match, ~, ind] = regexp(pt, "(\\*){ *(([\w_.\-@:]+)|>([\w_.\-@:]+)|for +([^ }]+) *= *([^}]+)|if ([^}]+)|elseif ([^}]+)) *}", "tokens", "match", "emptymatch");
             if numel(match) > 0
                 args = [{match(1)} num2cell(captureGroups{1}) {pt}];
-                if match(1).startsWith(["{for ", "{"+whitespacePattern+"for "]) || match(1).startsWith(["{if ", "{"+whitespacePattern+"if "])
+                if match(1).startsWith(["{for ", "{"+whitespacePattern+"for "])
                     stack(end+1) = "for";
+                elseif match(1).startsWith(["{if ", "{"+whitespacePattern+"if "])
+                    stack(end+1) = "if";
+                elseif match(1).startsWith(["{elseif ", "{"+whitespacePattern+"elseif "])
+                    if stack(end) ~= "if"
+                        error("Forge:UnmatchedElseif", "Unmatched elseif '%s'", match);
+                    end
                 elseif matches(match(1), ["{end}", "{"+whitespacePattern+"end}", "{end"+whitespacePattern+"}", "{"+whitespacePattern+"end"+whitespacePattern+"}"])
                     stack(end) = [];
                 end
@@ -90,12 +96,16 @@ classdef Forge
             out = replaceByFunction(obj, out, "(\\*){ *([\w_.\-@:]+) *}", @replaceVars, stack);
             out = replaceByFunction(obj, out, "(\\*){> *([\w_.\-@:]+) *}", @replacePartials, stack);
             out = replaceByFunction(obj, out, "(\\*){ *for +([\w_\-@:]+) *= *([^}]+) *}", @replaceFor, stack);
-            out = replaceByFunction(obj, out, "(\\*){ *if +(~ *|)([^}]+) *}", @replaceIf, stack);
+            out = replaceByFunction(obj, out, "(\\*){ *if ([^}]+) *}", @replaceIf, stack);
+            out = replaceByFunction(obj, out, "(\\*){ *elseif ([^}]+) *}", @replaceElseif, stack);
         end
         
         function out = replaceVars(~, stack, str, escapeChar, var, ~, ~)
             out = str;
             if numel(stack) > 0
+                if var == "else"
+                    out = """, ""true"",""";
+                end
                 return
             end
             if strlength(escapeChar) > 0
@@ -121,7 +131,7 @@ classdef Forge
             end
         end
         
-        function out = replaceIf(~, stack, str, escapeChar, ifNot, ifKey, ~, ~)
+        function out = replaceIf(~, stack, str, escapeChar, ifKey, ~, ~)
             out = str;
             if numel(stack) > 1
                 return
@@ -129,25 +139,39 @@ classdef Forge
             if strlength(escapeChar) > 0
                 out = regexprep(str, "\\", "", "once");
             elseif strlength(ifKey) > 0
-                if strlength(ifNot) > 0
-                    neg = "~";
-                else
-                    neg = "";
-                end
-                out = """+ifReplacement(obj,c,"""+ifKey+""","""+neg+""",""";
+                out = """+ifReplacement(obj,c,"""+ifKey+""",""";
             end
         end
-        
-        function fstr = ifReplacement(obj, c, ifKey, neg, template)
+
+        function out = replaceElseif(~, stack, str, escapeChar, elseifKey, a, b)
+            out = str;
+            if numel(stack) > 1
+                return
+            end
+            if strlength(escapeChar) > 0
+                out = regexprep(str, "\\", "", "once");
+            elseif strlength(elseifKey) > 0
+                out = """, """+elseifKey+""",""";
+            end
+        end
+
+        function fstr = ifReplacement(varargin)
+            obj = varargin{1};
+            c = varargin{2};
+            template = varargin{end};
             if ~isempty(fieldnames(c))
                 for f = string(fieldnames(c))'
                     eval(f+"=c.(f);");
                 end
             end
             fstr = "";
-            safeIfKey = eval(neg+"("+ifKey+")");
-            if safeIfKey
-                fstr=fstr + obj.render(template,c);
+            for ind = 3:2:numel(varargin)-1
+                ifKey = varargin{ind};
+                safeIfKey = eval(ifKey.replace("\quote", """"));
+                if safeIfKey
+                    fstr=fstr + obj.render(varargin{ind+1},c);
+                    return
+                end
             end
         end
         
