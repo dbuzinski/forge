@@ -57,19 +57,25 @@ disp(greeting);
 ```
 
 ### HTML Example
-This example is similar to the Basic Strings example above but shows how Forge can be used to render HTML.
+This example is similar to the Basic Strings example above but shows how Forge can be used to render HTML. First create a file called `post.mtl` with the defined template.
 
-> ℹ️ NOTE: This is an example using strings, but the recommended workflow is to use `fileread` to read from a template file with the `.mtl` extension, and either return the string or write it to the desired file format. See the examples folder for more examples.
+```html
+<!-- post.mtl -->
+<div>
+    <h2 style="margin-top: 0; color: #333;">{title}</h2>
+    <p style="color: #666; font-size: 14px;">
+        Posted on <time>{date}</time> by <span style="font-weight: bold;">{author}</span>
+    </p>
+    <p style="color: #555;">{summary}</p>
+    <a href="{ref}" style="color: blue; text-decoration: none;">Read more &rarr;</a>
+</div>
+```
+
+Next we load the file into MATLAB using `fileread` and render it.
 
 ```matlab
 % Load template to variable
-blogPostTmpl = "<div>" + ...
-    "<h2 style=""margin-top: 0; color: #333;"">{title}</h2>" + ...
-    "<p style=""color: #666; font-size: 14px;"">Posted on <time>{date}</time> by <span style=""font-weight: bold;"">{author}</span></p>" + ...
-    "<p style=""color: #555;"">{summary}</p>" + ...
-    "<a href=""{ref}"" style=""color: blue; text-decoration: none;"">Read more &rarr;</a>" + ...
-"</div>";
-
+blogPostTmpl = fileread("post.mtl");
 
 % Define template variables in the context
 ctx.title = "Getting started with Forge";
