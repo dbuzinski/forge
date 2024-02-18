@@ -33,7 +33,14 @@ classdef Forge
                 template (1,1) string
             end
             pt = obj.parse(template);
-            ct = eval("@(c)"""+pt+"""");
+            try
+                ct = eval("@(c)"""+pt+"""");
+            catch err
+                if err.identifier == "MATLAB:m_incomplete_statement"
+                    error("Forge:UnclosedTag", "At least one 'end' tag is missing.");
+                end
+                throw(err)
+            end
         end
 
         function pt = parse(obj, template, stack)
@@ -51,7 +58,7 @@ classdef Forge
                 pt = pt.replace(match(i), replaceComments(obj, stack, args{:}));
             end
             % Replace all tags
-            [captureGroups, match, ~, ind] = regexp(pt, "(\\*){ *(([\w_.\-@:]+)|>([\w_.\-@:]+)|for +([^ }]+) *= *([^}]+)|if ([^}]+)|elseif ([^}]+)) *}", "tokens", "match", "emptymatch");
+            [captureGroups, match, ~, ind] = regexp(pt, "(\\*){ *(([\w_.\-@:]+)|>([\w_.\-@:]+)|for *([^ }]*) *= *([^}]*)|if *([^}]*)|elseif *([^}]*)) *}", "tokens", "match", "emptymatch");
             if numel(match) > 0
                 args = [{match(1)} num2cell(captureGroups{1}) {pt}];
                 if match(1).startsWith(["{for ", "{"+whitespacePattern+"for "])
@@ -59,10 +66,13 @@ classdef Forge
                 elseif match(1).startsWith(["{if ", "{"+whitespacePattern+"if "])
                     stack(end+1) = "if";
                 elseif match(1).startsWith(["{elseif ", "{"+whitespacePattern+"elseif "])
-                    if stack(end) ~= "if"
-                        error("Forge:UnmatchedElseif", "Unmatched elseif '%s'", match);
+                    if isempty(stack) || stack(end) ~= "if"
+                        error("Forge:UnmatchedElseifTag", "'elseif' tag found without corresponding 'if' tag '%s'.", match{1});
                     end
                 elseif matches(match(1), ["{end}", "{"+whitespacePattern+"end}", "{end"+whitespacePattern+"}", "{"+whitespacePattern+"end"+whitespacePattern+"}"])
+                    if isempty(stack)
+                        error("Forge:UnmatchedEndTag", "'end' tag found without corresponding 'if' or 'for' tag.");
+                    end
                     stack(end) = [];
                 end
                 left = extractBefore(pt, ind(1)+1).replace(match(1), replaceTags(obj, stack, args{:}));
@@ -93,10 +103,19 @@ classdef Forge
             stack = varargin{2};
             str = varargin{3};
             out = str;
+            if ~isempty(regexp(str, "(\\*){ *for *([^}]*) *}", "once")) && isempty(regexp(str, "(\\*){ *for +([\w_\-@:]+) *= *([^}]+) *}", "once"))
+                error("Forge:BadForTag", "Invalid 'for' syntax '%s'", str);
+            end
+            if ~isempty(regexp(str, "(\\*){ *if *([^}]*) *}", "once")) && isempty(regexp(str, "(\\*){ *if *([^}]+) *}", "once"))
+                error("Forge:BadIfTag", "Invalid 'if' syntax '%s'", str);
+            end
+            if ~isempty(regexp(str, "(\\*){ *elseif *([^}]*) *}", "once")) && isempty(regexp(str, "(\\*){ *elseif ([^}]+) *}", "once"))
+                error("Forge:BadElseifTag", "Invalid 'elseif' syntax '%s'", str);
+            end
             out = replaceByFunction(obj, out, "(\\*){ *([\w_.\-@:]+) *}", @replaceVars, stack);
             out = replaceByFunction(obj, out, "(\\*){> *([\w_.\-@:]+) *}", @replacePartials, stack);
             out = replaceByFunction(obj, out, "(\\*){ *for +([\w_\-@:]+) *= *([^}]+) *}", @replaceFor, stack);
-            out = replaceByFunction(obj, out, "(\\*){ *if ([^}]+) *}", @replaceIf, stack);
+            out = replaceByFunction(obj, out, "(\\*){ *if *([^}]+) *}", @replaceIf, stack);
             out = replaceByFunction(obj, out, "(\\*){ *elseif ([^}]+) *}", @replaceElseif, stack);
         end
         
@@ -143,7 +162,7 @@ classdef Forge
             end
         end
 
-        function out = replaceElseif(~, stack, str, escapeChar, elseifKey, a, b)
+        function out = replaceElseif(~, stack, str, escapeChar, elseifKey, ~, ~)
             out = str;
             if numel(stack) > 1
                 return
@@ -158,7 +177,6 @@ classdef Forge
         function fstr = ifReplacement(varargin)
             obj = varargin{1};
             c = varargin{2};
-            template = varargin{end};
             if ~isempty(fieldnames(c))
                 for f = string(fieldnames(c))'
                     eval(f+"=c.(f);");
@@ -167,7 +185,16 @@ classdef Forge
             fstr = "";
             for ind = 3:2:numel(varargin)-1
                 ifKey = varargin{ind};
-                safeIfKey = eval(ifKey.replace("\quote", """"));
+                try
+                    safeIfKey = eval(ifKey.replace("\quote", """"));
+                    safeIfKey = logical(safeIfKey);
+                catch caughtException
+                    errID = "Forge:BadIfTag";
+                    msg = sprintf("Unable to parse 'if' tag condition '%s'.", ifKey);
+                    baseException = MException(errID,msg);
+                    baseException = addCause(baseException, caughtException);
+                    throw(baseException);
+                end
                 if safeIfKey
                     fstr=fstr + obj.render(varargin{ind+1},c);
                     return
@@ -194,8 +221,16 @@ classdef Forge
                 end
             end
             fstr = "";
-            safeForKey = eval(forKey);
-            safeForKey = safeForKey(:)';
+            try
+                safeForKey = eval(forKey);
+                safeForKey = safeForKey(:)';
+            catch caughtException
+                errID = "Forge:BadForTag";
+                msg = sprintf("Unable to parse 'for' tag iterator '%s'.", forKey);
+                baseException = MException(errID,msg);
+                baseException = addCause(baseException, caughtException);
+                throw(baseException);
+            end
             for safeIterVar = safeForKey
                 c.(iterVar)=safeIterVar;
                 fstr = fstr + obj.render(template,c);
