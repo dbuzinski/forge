@@ -44,6 +44,9 @@ disp(greeting);
 We can build on this example using loops and conditional statements to greet all names in a list.
 
 ```matlab
+% Create the renderer
+renderer = Forge();
+
 % Create a template string to loop through 'names'.
 % Use a conditional to ensure the grammar is correct if we are at the end of the list.
 tmpl = "Hello {for name=names}{if name~=names(end)}{name}, {end}{if name==names(end)}and {name}.{end}{end}";
@@ -74,6 +77,9 @@ This example is similar to the Basic Strings example above but shows how Forge c
 Next we load the file into MATLAB using `fileread` and render it.
 
 ```matlab
+% Create the renderer
+renderer = Forge();
+
 % Load template to variable
 blogPostTmpl = fileread("post.mtl");
 
