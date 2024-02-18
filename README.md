@@ -106,18 +106,18 @@ Example: `"{myvar}"`
 
 ### Comments
 
-Comments in Forge are denoted by {% and %}.  Text within these markers will not be rendered, allowing template  authors to include notes or explanations within their templates.  Comments can span multiple lines and include spaces, newlines, and other tags without affecting the output.
+Comments in Forge are denoted by `{%` and `%}`.  Text within these markers will not be rendered, allowing template  authors to include notes or explanations within their templates.  Comments can span multiple lines and include spaces, newlines, and other tags without affecting the output.
 
 Example: `"{% This won't show up in the rendered string %}"`
 
 ### Conditionals
 
-Conditional logic is supported using the if, elseif, and else  keywords within tags. This feature enables the template to render or  omit specific substrings based on given conditions. Every conditional  block must be concluded with an end tag.
+Conditional logic is supported using the `if`, `elseif`, and `else`  keywords within tags. This feature enables the template to render or  omit specific substrings based on given conditions. Every conditional  block must be concluded with an `end` tag.
 
 Example: `"{if isempty(posts)}There are no posts!{else}There are posts!{end}"`
 
 ### Loops
-Loops are constructed with the for keyword, following MATLAB's loop syntax, and must also be concluded with an end tag. This functionality allows for the iteration over arrays within the template. Every loop must be closed with an 'end' tag.
+Loops are constructed with the `for` keyword, following MATLAB's loop syntax, and must also be concluded with an end tag. This functionality allows for the iteration over arrays within the template. Every loop must be closed with an `end` tag.
 
 Example: `"{for name=names}Hi {name}!{end}"`
 
