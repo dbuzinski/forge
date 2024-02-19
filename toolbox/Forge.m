@@ -177,7 +177,7 @@ classdef Forge < handle
         function out = replaceVars(~, stack, str, escapeChar, var, ~, ~)
             out = str;
             if numel(stack) > 0
-                if var == "else"
+                if var == "else" && stack(1) == "if"
                     out = """, ""true"",""";
                 end
                 return

@@ -53,5 +53,23 @@ classdef tIf < matlab.unittest.TestCase
             f = Forge();
             testCase.verifyEqual(f.render("{if false}blah{elseif false}blah{else}{a}{end}", context), "euclid");
         end
+
+        function testForIfElseifElse(testCase)
+            context = struct("names", ["Jim", "Jeff", "Jane"]);
+            f = Forge();
+            tmpl = "Hello {for name=names}{if name==""Jeff""}Jeffrey, {elseif name~=names(end)}{name}, {else}and {name}.{end}{end}";
+            testCase.verifyEqual(f.render(tmpl, context), "Hello Jim, Jeffrey, and Jane.");
+        end
+
+        function testIfElseifFor(testCase)
+            f = Forge();
+            context = struct("greeting", "hello", "names", ["Jim", "Jeff", "Jane"]);
+            tmpl = "{if greeting == ""hello""}Hello!{elseif greeting == ""goodbye""}{for name=names}Goodbye {name}! {end}{else}{for name=names}Hello {name}! {end}{end}";
+            testCase.verifyEqual(f.render(tmpl, context), "Hello!");
+            context = struct("greeting", "goodbye", "names", ["Jim", "Jeff", "Jane"]);
+            testCase.verifyEqual(f.render(tmpl, context), "Goodbye Jim! Goodbye Jeff! Goodbye Jane! ");
+            context = struct("greeting", "default", "names", ["Jim", "Jeff", "Jane"]);
+            testCase.verifyEqual(f.render(tmpl, context), "Hello Jim! Hello Jeff! Hello Jane! ");
+        end
     end
 end

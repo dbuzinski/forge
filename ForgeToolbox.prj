@@ -4,10 +4,10 @@
     <param.authnamewatermark>David Buzinski</param.authnamewatermark>
     <param.email>davidbuzinski@gmail.com</param.email>
     <param.company />
-    <param.summary />
+    <param.summary>Forge is an intuitive yet powerful template engine for MATLAB.</param.summary>
     <param.description />
     <param.screenshot>${PROJECT_ROOT}/images/Forge.png</param.screenshot>
-    <param.version>1.0</param.version>
+    <param.version>0.1.1</param.version>
     <param.output>${PROJECT_ROOT}/Forge Template Engine.mltbx</param.output>
     <param.products.name />
     <param.products.id />
@@ -28,8 +28,8 @@
     <param.required.addons />
     <param.matlab.project.id />
     <param.matlab.project.name />
-    <param.release.start />
-    <param.release.end />
+    <param.release.start>R2022b</param.release.start>
+    <param.release.end>latest</param.release.end>
     <param.release.current.only>false</param.release.current.only>
     <param.compatiblity.windows>true</param.compatiblity.windows>
     <param.compatiblity.macos>true</param.compatiblity.macos>
@@ -43,9 +43,7 @@
     <param.additional.sw.linux.url />
     <unset>
       <param.company />
-      <param.summary />
       <param.description />
-      <param.version />
       <param.output />
       <param.products.name />
       <param.products.id />
@@ -65,8 +63,6 @@
       <param.required.addons />
       <param.matlab.project.id />
       <param.matlab.project.name />
-      <param.release.start />
-      <param.release.end />
       <param.release.current.only />
       <param.compatiblity.windows />
       <param.compatiblity.macos />
@@ -85,6 +81,7 @@
     <fileset.rootfiles>
       <file>${PROJECT_ROOT}/toolbox/Forge.m</file>
       <file>${PROJECT_ROOT}/toolbox/GettingStarted.mlx</file>
+      <file>${PROJECT_ROOT}/toolbox/doc</file>
       <file>${PROJECT_ROOT}/toolbox/examples</file>
     </fileset.rootfiles>
     <fileset.depfun.included />

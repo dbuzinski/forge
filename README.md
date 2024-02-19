@@ -51,7 +51,7 @@ renderer = Forge();
 
 % Create a template string to loop through 'names'.
 % Use a conditional to ensure the grammar is correct if we are at the end of the list.
-tmpl = "Hello {for name=names}{if name~=names(end)}{name}, {end}{if name==names(end)}and {name}.{end}{end}";
+tmpl = "Hello {for name=names}{if name~=names(end)}{name}, {else}and {name}.{end}{end}";
 
 % Create a context with a list of names
 ctx.names = ["Jim", "Jeff", "Jane"];
