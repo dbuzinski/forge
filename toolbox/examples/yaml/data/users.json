@@ -1,0 +1,22 @@
+[
+    {
+        "name": "John Doe",
+        "age": 30,
+        "emails": [
+            {"email": "johndoe@email.com"},
+            {"email": "bigjohn@hotmail.com"}
+        ]
+    },
+    {
+        "name": "Jane Doe",
+        "age": 36,
+        "emails": []
+    },
+    {
+        "name": "Jeff Dough",
+        "age": 29,
+        "emails": [
+            {"email": "juicyjeff@hotmail.com"}
+        ]
+    }
+]

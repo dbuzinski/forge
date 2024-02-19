@@ -1,4 +1,4 @@
-classdef Forge
+classdef Forge < handle
     properties
         CacheEnabled (1,1) logical = true
     end

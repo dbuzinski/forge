@@ -1,0 +1,4 @@
+<div style="text-align: center; padding: 10px; background-color: #f3f3f3;">
+    <h1>{title}</h1>
+    <p>Welcome to the {organization} dev blog!</p>
+</div>

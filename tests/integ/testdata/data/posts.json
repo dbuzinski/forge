@@ -1,0 +1,20 @@
+[
+    {
+        "title": "Using Forge with Blink web framework",
+        "author": "David Buzinski",
+        "summary": "Pair up Forge with Blink web framework for surprising results. Create amazingly responsive web apps using only MATLAB code!",
+        "date": "February 18, 2024"
+    },
+    {
+        "title": "Super charge your configuration with Forge",
+        "author": "David Buzinski",
+        "summary": "Forge can render reusable yaml or json files in a snap. Take your team's configuration to the next level!",
+        "date": "February 11, 2024"
+    },
+    {
+        "title": "Getting started with Forge",
+        "author": "David Buzinski",
+        "summary": "Learn how to use Forge to manage all of your templating needs with MATLAB!",
+        "date": "February 2, 2024"
+    }
+]

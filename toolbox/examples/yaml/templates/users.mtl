@@ -1,0 +1,13 @@
+---
+users:
+{for user=users}
+  - name: {user.name}
+    age: {user.age}
+    {if ~isempty(user.emails)}
+    emails:
+      {for email = user.emails}
+      - {email.email}
+      {end}
+    {end}
+{end}
+...

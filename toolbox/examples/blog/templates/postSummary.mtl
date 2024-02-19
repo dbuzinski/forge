@@ -1,0 +1,6 @@
+<div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px;">
+    <h2 style="margin-top: 0; color: #333;">{post.title}</h2>
+    <p style="color: #666; font-size: 14px;">Posted on <time>{post.date}</time> by <span style="font-weight: bold;">{post.author}</span></p>
+    <p style="color: #555;">{post.summary}</p>
+    <a href="#" style="color: blue; text-decoration: none;">Read more &rarr;</a>
+</div>

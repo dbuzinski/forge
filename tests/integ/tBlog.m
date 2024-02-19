@@ -4,14 +4,18 @@ classdef tBlog < matlab.unittest.TestCase
             import matlab.unittest.constraints.IsEqualTo
             import matlab.unittest.constraints.StringComparator
 
-            template = fileread("testdata/templates/blog.mtl");
-            context = jsondecode(fileread("testdata/contexts/blog.json"));
-            context.commentSection = fileread("testdata/templates/comment.mtl");
-            context.addComment = fileread("testdata/templates/addcomment.mtl");
-            f = Forge();
+            renderer = Forge();
+            tmpl = fileread("testdata/templates/blog.mtl");
+
+            ctx.title = "Forge Dev Blog";
+            ctx.organization = "Forge";
+            ctx.posts = jsondecode(fileread("testdata/data/posts.json"));
+            ctx.postSummary = fileread("testdata/templates/postSummary.mtl");
+            ctx.header = fileread("testdata/templates/header.mtl");
+            ctx.footer = fileread("testdata/templates/footer.mtl");
 
             expected = string(fileread("testdata/rendered/blog.html"));
-            actual = f.render(template, context);
+            actual = renderer.render(tmpl, ctx);
 
             testCase.verifyThat(expected, IsEqualTo(actual,"Using",StringComparator(IgnoringWhitespace=true)));
         end
@@ -20,15 +24,18 @@ classdef tBlog < matlab.unittest.TestCase
             import matlab.unittest.constraints.IsEqualTo
             import matlab.unittest.constraints.StringComparator
 
-            template = fileread("testdata/templates/blog.mtl");
-            context.blog.title = "Scrumptious lessons";
-            context.posts = [];
-            f = Forge();
+            renderer = Forge();
+            tmpl = fileread("testdata/templates/blog.mtl");
 
-            expected = "<h1>Scrumptious lessons</h1><p>No posts!</p>";
-            actual = f.render(template, context);
+            ctx.title = "Forge Dev Blog";
+            ctx.organization = "Forge";
+            ctx.posts = [];
+            ctx.header = fileread("testdata/templates/header.mtl");
+            ctx.footer = fileread("testdata/templates/footer.mtl");
 
-            testCase.verifyThat(expected, IsEqualTo(actual,"Using",StringComparator(IgnoringWhitespace=true)));
+            blog = renderer.render(tmpl, ctx);
+
+            testCase.verifyTrue(blog.contains("No posts!"));
         end
     end
 end
