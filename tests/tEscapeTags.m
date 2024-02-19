@@ -1,53 +1,53 @@
 classdef tEscapeTags < matlab.unittest.TestCase
     methods (Test)
-        function testEscapeBob(testCase)
-            input = "\{bob}";
-            expected = "{bob}";
+        function testEscape(testCase)
+            input = "\{euclid}";
+            expected = "{euclid}";
 
             f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
 
-        function testEscapeBobBloss(testCase)
-            input = "\{bob.bloss}";
-            expected = "{bob.bloss}";
+        function testEscapeDotRef(testCase)
+            input = "\{euclid.hilbert}";
+            expected = "{euclid.hilbert}";
 
             f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
 
-        function testEscapeReindeer(testCase)
-            input = "\{>reindeer}";
-            expected = "{>reindeer}";
+        function testEscapePartial(testCase)
+            input = "\{>euclid}";
+            expected = "{>euclid}";
 
             f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
 
-        function testEscapeForAngerInMgmt(testCase)
-            input = "\{for anger=mgmt}";
-            expected = "{for anger=mgmt}";
+        function testEscapeFor(testCase)
+            input = "\{for mathematician=mathematicians}";
+            expected = "{for mathematician=mathematicians}";
 
             f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
 
-        function testEscapeIfThen(testCase)
-            input = "\{if then}";
-            expected = "{if then}";
+        function testEscapeIf(testCase)
+            input = "\{if isa(euclid, Geometer)}";
+            expected = "{if isa(euclid, Geometer)}";
 
             f = Forge();
             result = f.render(input, struct);
             testCase.verifyEqual(result, expected);
         end
 
-        function testEscapeIfNotNow(testCase)
-            input = "\{if ~ now}";
-            expected = "{if ~ now}";
+        function testEscapeIfNot(testCase)
+            input = "\{if ~ isempty(unsolvedProblems)}";
+            expected = "{if ~ isempty(unsolvedProblems)}";
 
             f = Forge();
             result = f.render(input, struct);

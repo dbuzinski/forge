@@ -77,7 +77,7 @@ classdef Forge < handle
             else
                 tmplFn = renderer.compile(template);
             end
-            result = string(tmplFn(context)).replace("\n", newline).replace("\quote", """");
+            result = string(tmplFn(context)).replace("__newline_10__", newline).replace("__newline_13__", char(13)).replace("__quote__", """");
         end
     end
 
@@ -105,7 +105,7 @@ classdef Forge < handle
                 stack (1,:) string = string.empty()
             end
             % Remove \r and escape quotes
-            pt = template.replace(newline, "\n").replace("\r", "").replace("""", "\quote");
+            pt = template.replace(newline, "__newline_10__").replace(char(13), "__newline_13__").replace("""", "__quote__");
             % Replace all comments
             [captureGroups, match] = regexp(pt, "(\\*){%[\s\S]*?%}", "tokens", "emptymatch", "match");
             for i=1:numel(match)
@@ -241,7 +241,7 @@ classdef Forge < handle
             for ind = 3:2:numel(varargin)-1
                 ifKey = varargin{ind};
                 try
-                    safeIfKey = eval(ifKey.replace("\quote", """"));
+                    safeIfKey = eval(ifKey.replace("__quote__", """"));
                     safeIfKey = logical(safeIfKey);
                 catch caughtException
                     errID = "Forge:BadIfTag";
@@ -277,7 +277,7 @@ classdef Forge < handle
             end
             fstr = "";
             try
-                safeForKey = eval(forKey.replace("\quote", """"));
+                safeForKey = eval(forKey.replace("__quote__", """"));
                 safeForKey = safeForKey(:)';
             catch caughtException
                 errID = "Forge:BadForTag";

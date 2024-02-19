@@ -9,7 +9,7 @@ classdef tChars < matlab.unittest.TestCase
             testCase.verifyEqual(result, expected);
         end
 
-        function testEscapeSingleQuote(testCase)
+        function testSingleQuote(testCase)
             input = "''";
             expected = "''";
 
@@ -18,7 +18,7 @@ classdef tChars < matlab.unittest.TestCase
             testCase.verifyEqual(result, expected);
         end
 
-        function testEscapeDoubleQuote(testCase)
+        function testDoubleQuote(testCase)
             input = """";
             expected = """";
 
@@ -55,8 +55,8 @@ classdef tChars < matlab.unittest.TestCase
         end
 
         function testCarriageReturnNewline(testCase)
-            input = "euclid\r"+newline+"hilbert";
-            expected = "euclid"+newline+"hilbert";
+            input = "euclid"+char(13)+"hilbert";
+            expected = "euclid"+char(13)+"hilbert";
 
             f = Forge();
             result = f.render(input);

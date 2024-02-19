@@ -20,7 +20,7 @@ classdef tBlog < matlab.unittest.TestCase
             testCase.verifyThat(expected, IsEqualTo(actual,"Using",StringComparator(IgnoringWhitespace=true)));
         end
 
-        function testEmpty(testCase)
+        function testNoPosts(testCase)
             import matlab.unittest.constraints.IsEqualTo
             import matlab.unittest.constraints.StringComparator
 
