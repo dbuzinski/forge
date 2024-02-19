@@ -1,0 +1,25 @@
+name: Release toolbox
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    name: Release toolbox
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v2
+      - name: Package toolbox
+        uses: matlab-actions/run-build@v2
+        with:
+          tasks: package
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create ${{  github.ref_name }} Forge.mltbx

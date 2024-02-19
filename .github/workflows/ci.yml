@@ -1,8 +1,8 @@
-name: Run MATLAB Build
+name: Build toolbox
 on: [push]
 jobs:
-  my-job:
-    name: Run MATLAB Build
+  build:
+    name: Build toolbox
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository

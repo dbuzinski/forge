@@ -85,7 +85,7 @@
     <fileset.rootfiles>
       <file>${PROJECT_ROOT}/toolbox/Forge.m</file>
       <file>${PROJECT_ROOT}/toolbox/GettingStarted.mlx</file>
-      <file>${PROJECT_ROOT}/toolbox/doc</file>
+      <file>${PROJECT_ROOT}/toolbox/examples</file>
     </fileset.rootfiles>
     <fileset.depfun.included />
     <fileset.depfun.excluded />
