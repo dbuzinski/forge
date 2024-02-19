@@ -1,4 +1,4 @@
-name: Build toolbox
+name: Run integration tests
 on: [workflow_dispatch]
 jobs:
   build:
