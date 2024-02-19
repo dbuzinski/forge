@@ -11,6 +11,8 @@ Forge is an intuitive yet powerful template engine crafted for generating dynami
 Examples
 --------
 
+See the [examples](/toolbox/examples) folder for more detailed examples.
+
 ### Basic Strings
 
 Installing the toolbox will add Forge to your MATLAB path. Create an instance of this class as a renderer.
