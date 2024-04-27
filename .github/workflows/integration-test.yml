@@ -8,7 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         platform: [ubuntu-latest, windows-latest, macos-latest]
-        release: [R2022b, R2023a, R2023b]
+        release: [R2022b, R2023a, R2023b, R2024a]
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
